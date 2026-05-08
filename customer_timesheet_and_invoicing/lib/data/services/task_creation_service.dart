@@ -18,4 +18,13 @@ class TaskCreationService {
     final result = await db.query('tasks');
     return result;
   }
+
+  Future<int> deleteTask(String task) async {
+    final db = await AppDatabase.instance.database;
+    return await db.delete(
+      'tasks',
+      where: 'task = ?',
+      whereArgs: [task],  
+    );
+  }
 }

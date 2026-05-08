@@ -18,4 +18,13 @@ class PosCreationServices {
     final result = await db.query('purchase_order_numbers');
     return result;
   }
+
+  Future<int> deletePos(String pos) async {
+    final db = await AppDatabase.instance.database;
+    return await db.delete(
+      'purchase_order_numbers',
+      where: 'pos = ?',
+      whereArgs: [pos],  
+    );
+  }
 }

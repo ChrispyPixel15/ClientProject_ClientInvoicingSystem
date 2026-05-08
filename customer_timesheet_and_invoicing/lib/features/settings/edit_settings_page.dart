@@ -79,6 +79,25 @@ class _EditSettingsState extends State<EditSettings> {
   }
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _busNameController.dispose();
+    _numberController.dispose();
+    _emailController.dispose();
+    _vatNumberController.dispose();
+    _vatPercentageController.dispose();
+    _streetAddressController.dispose();
+    _cityController.dispose();
+    _suburbController.dispose();
+    _postalCodeController.dispose();
+    _bankController.dispose();
+    _branchCodeController.dispose();
+    _bicController.dispose();
+    _accountNumberController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Row(
         children: [

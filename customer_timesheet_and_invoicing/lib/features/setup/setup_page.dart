@@ -1,3 +1,4 @@
+import 'package:customer_timesheet_and_invoicing/core/theme_controller.dart';
 import 'package:customer_timesheet_and_invoicing/data/models/user_model.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/user_creation_service.dart';
 import 'package:customer_timesheet_and_invoicing/features/auth/login_page.dart';
@@ -7,7 +8,8 @@ import 'package:customer_timesheet_and_invoicing/features/setup/setup_two.dart';
 import 'package:flutter/material.dart';
 
 class SetupPage extends StatefulWidget {
-  const SetupPage({super.key});
+  final ThemeController themeController;
+  const SetupPage({super.key, required this.themeController});
 
   @override
   _SetupPageState createState() => _SetupPageState();
@@ -109,7 +111,7 @@ class _SetupPageState extends State<SetupPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LoginPage(),
+          builder: (context) => LoginPage(themeController: widget.themeController),
         ),
       );
     }

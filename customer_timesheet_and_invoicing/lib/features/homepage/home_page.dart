@@ -1,3 +1,4 @@
+import 'package:customer_timesheet_and_invoicing/core/theme_controller.dart';
 import 'package:customer_timesheet_and_invoicing/features/clients/client_profile_page.dart';
 import 'package:customer_timesheet_and_invoicing/features/clients/clients_list_page.dart';
 import 'package:customer_timesheet_and_invoicing/features/settings/edit_settings_page.dart';
@@ -6,7 +7,8 @@ import 'package:customer_timesheet_and_invoicing/features/timesheet/timesheet_pa
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final ThemeController themeController;
+  const HomePage({super.key, required this.themeController});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -40,7 +42,7 @@ class _HomePageState extends State<HomePage> {
         page = Clients(onClientPressed: changePage);
         break;
       case 2: 
-        page = Settings(onEditPressed: changePage);        
+        page = Settings(onEditPressed: changePage, themeController: widget.themeController);        
         break;
       case 3: 
         page = ClientProfile(clientID: clickedClientID);

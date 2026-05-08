@@ -1,12 +1,16 @@
 import 'package:bcrypt/bcrypt.dart';
 import 'package:customer_timesheet_and_invoicing/core/text_input.dart';
+import 'package:customer_timesheet_and_invoicing/core/theme_controller.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/user_creation_service.dart';
 import 'package:customer_timesheet_and_invoicing/features/homepage/home_page.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
+  final ThemeController themeController;
+
   const LoginPage({
     super.key,
+    required this.themeController
   });
 
   @override
@@ -32,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => HomePage(),
+          builder: (context) => HomePage(themeController: widget.themeController),
         ),
       );
   }
