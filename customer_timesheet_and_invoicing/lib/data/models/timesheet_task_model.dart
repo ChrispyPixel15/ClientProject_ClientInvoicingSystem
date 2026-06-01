@@ -5,7 +5,7 @@ class TimesheetTask {
   final String clientFK;
   final String date;
   final String hours;
-  final String paid;
+  final String invoiced;
 
   TimesheetTask({
     this.id,
@@ -14,7 +14,7 @@ class TimesheetTask {
     required this.clientFK,
     required this.date,
     required this.hours,
-    required this.paid,
+    required this.invoiced,
   });
 
   Map<String, dynamic> toMap() {
@@ -25,7 +25,7 @@ class TimesheetTask {
       'client_fk': clientFK,
       'date': date,
       'hours': hours,
-      'paid': paid,
+      'invoiced': invoiced,
     };
   }
 
@@ -37,7 +37,7 @@ class TimesheetTask {
       clientFK: map['client_fk'],
       date: map['date'],
       hours: map['hours'],
-      paid: map['paid'],
+      invoiced: map['invoiced'],
     );
   }
 }

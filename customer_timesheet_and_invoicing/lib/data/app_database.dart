@@ -84,6 +84,7 @@ class AppDatabase {
         client_suburb TEXT,
         client_city TEXT,
         client_postal_code INTEGER,
+        client_price_ph FLOAT,
         notes TEXT,
         status TEXT,
         unpaid_invoices INTEGER
@@ -100,9 +101,23 @@ class AppDatabase {
         client_fk TEXT,
         date TEXT,
         hours INTEGER,
-        paid TEXT,
+        invoiced TEXT,
         FOREIGN KEY (task_fk) REFERENCES tasks(task),
         FOREIGN KEY (pos_fk) REFERENCES purchase_order_numbers(pos),
+        FOREIGN KEY (client_fk) REFERENCES clients(client_bus_name)
+      )
+      '''
+    );
+
+    await db.execute(
+      '''
+      CREATE TABLE invoices (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_fk TEXT,
+        invoice_number INTEGER,
+        date TEXT,
+        paid TEXT,
+        dir TEXT,
         FOREIGN KEY (client_fk) REFERENCES clients(client_bus_name)
       )
       '''

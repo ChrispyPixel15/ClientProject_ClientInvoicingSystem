@@ -177,6 +177,7 @@ class _SetupOneState extends State<SetupOne> {
                     vatRegistered: widget.vatRegistered.toString(),
                     vatNum: int.parse(_vatNumberController.text),
                     vatPercent: int.parse(_vatPercentageController.text),
+                    recentInvoice: int.parse(_invoiceController.text),
                   );
                   widget.onPressed();
                 }, 

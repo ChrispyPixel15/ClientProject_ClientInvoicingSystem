@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:customer_timesheet_and_invoicing/core/theme_controller.dart';
 import 'package:customer_timesheet_and_invoicing/data/models/user_model.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/user_creation_service.dart';
@@ -191,6 +193,17 @@ class _SetupPageState extends State<SetupPage> {
         ),
       ),
       backgroundColor: Theme.of(context).primaryColor,
+      bottomNavigationBar: BottomAppBar(
+        color: Theme.of(context).primaryColor,
+        height: 48,
+        child: Text(
+          "\u00a9 ${DateTime.now().year} Chris Designed. All Rights Reserved.",
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodySmall?.color,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }

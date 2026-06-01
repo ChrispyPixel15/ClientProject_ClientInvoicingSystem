@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class Client {
   final String id;
   final String clientBusName;
@@ -9,6 +11,7 @@ class Client {
   final String clientSuburb;
   final String clientCity;
   final int clientPostalCode;
+  final Float clientPricePH;
   final String notes;
   final String status;
   final int unpaidInvoices;
@@ -24,6 +27,7 @@ class Client {
     required this.clientSuburb,
     required this.clientCity,
     required this.clientPostalCode,
+    required this.clientPricePH,
     required this.notes,
     required this.status,
     required this.unpaidInvoices,
@@ -41,6 +45,7 @@ class Client {
       'client_suburb': clientSuburb,
       'client_city': clientCity,
       'client_postal_code': clientPostalCode,
+      'client_price_ph': clientPricePH,
       'notes': notes,
       'status': status,
       'unpaid_invoices': unpaidInvoices,
@@ -59,6 +64,7 @@ class Client {
       clientSuburb: map['client_suburb'],
       clientCity: map['client_city'],
       clientPostalCode: map['client_postal_code'],
+      clientPricePH: map['client_price_ph'],
       notes: map['notes'],
       status: map['status'],
       unpaidInvoices: map['unpaid_invoices']

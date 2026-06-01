@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:customer_timesheet_and_invoicing/core/text_input.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/client_creation_services.dart';
 import 'package:customer_timesheet_and_invoicing/features/clients/components/client_list_item.dart';
@@ -30,7 +32,7 @@ class _ClientsState extends State<Clients> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _vatNumberController = TextEditingController();
-
+  final TextEditingController _quotePriceController = TextEditingController();
   List<Map<String, dynamic>> clientList = [];
 
   @override
@@ -55,7 +57,8 @@ class _ClientsState extends State<Clients> {
     String address,
     String suburb,
     String city,
-    int postalCode
+    int postalCode,
+    double quotePrice,
   ) async {
     String newIDLetters = name.substring(0, 2).toUpperCase();
     String newIDNumbers = DateTime.now().hashCode.toString();
@@ -71,6 +74,7 @@ class _ClientsState extends State<Clients> {
       'client_suburb': suburb,
       'client_city': city,
       'client_postal_code': postalCode,
+      'client_price_ph': quotePrice,
       'status': "active",
       'unpaid_invoices': 0,
     });
@@ -99,7 +103,8 @@ class _ClientsState extends State<Clients> {
     String address, 
     String suburb, 
     String city, 
-    int postalCode) async {
+    int postalCode,
+    double quotePrice) async {
     await clientServices.updateClient(id, {
       'client_bus_name': name,
       'client_contact_person': contactPerson,
@@ -110,6 +115,7 @@ class _ClientsState extends State<Clients> {
       'client_suburb': suburb,
       'client_city': city,
       'client_postal_code': postalCode,
+      'client_price_ph': quotePrice,
     });
     loadClients();
   }
@@ -126,6 +132,7 @@ class _ClientsState extends State<Clients> {
     _cityController.dispose();
     _postalCodeController.dispose();
     _searchController.dispose();
+    _quotePriceController.dispose();
     super.dispose();
   }
 
@@ -152,6 +159,7 @@ class _ClientsState extends State<Clients> {
       _suburbController.text = result["client_suburb"];
       _cityController.text = result["client_city"];
       _postalCodeController.text = result["client_postal_code"].toString();
+      _quotePriceController.text = result["client_price_ph"].toString();
       setState(() {
         editClient = edit;
         selectedClientID = id;
@@ -168,6 +176,7 @@ class _ClientsState extends State<Clients> {
       _suburbController.clear();
       _cityController.clear();
       _postalCodeController.clear();
+      _quotePriceController.clear();
     }
 
     return Stack(
@@ -529,9 +538,10 @@ class _ClientsState extends State<Clients> {
                         right: 20
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           CustomTextInput(labelName: "VAT Number", hintText: "VAT Number...", password: false, inputController: _vatNumberController),
+                          CustomTextInput(labelName: "Quoted Price p/h", hintText: "Quoted Price...", password: false, inputController: _quotePriceController),
                         ],
                       ),
                     ),
@@ -554,7 +564,8 @@ class _ClientsState extends State<Clients> {
                                 _streetAddressController.text, 
                                 _suburbController.text, 
                                 _cityController.text, 
-                                int.parse(_postalCodeController.text)
+                                int.parse(_postalCodeController.text),
+                                double.parse(_quotePriceController.text)
                               );
                               setState(() {
                                 addClient = false;
@@ -748,7 +759,7 @@ class _ClientsState extends State<Clients> {
                             left: 20
                           ),
                           child: Text(
-                            "New Client",
+                            "Edit Client",
                             style: TextStyle(
                               color: Theme.of(context).textTheme.bodySmall?.color,
                               fontSize: 26,
@@ -822,9 +833,10 @@ class _ClientsState extends State<Clients> {
                         right: 20
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           CustomTextInput(labelName: "VAT Number", hintText: "VAT Number...", password: false, inputController: _vatNumberController),
+                          CustomTextInput(labelName: "Quoted Price p/h", hintText: "Quoted Price...", password: false, inputController: _quotePriceController),
                         ],
                       ),
                     ),
@@ -848,7 +860,8 @@ class _ClientsState extends State<Clients> {
                                 _streetAddressController.text, 
                                 _suburbController.text, 
                                 _cityController.text, 
-                                int.parse(_postalCodeController.text)
+                                int.parse(_postalCodeController.text),
+                                double.parse(_quotePriceController.text),
                               );
                               setState(() {
                                 editClient = false;

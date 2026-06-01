@@ -8,11 +8,10 @@ class TimeTaskListItem extends StatefulWidget {
   final String client;
   final String date;
   final String hours;
-  final String paid;
+  final String invoiced;
   final Color rowColor;
   final Function(int id, bool delete) deleteFunc;
   final Function(int id, bool edit, String task, String client, String pos, int hours, String date) editFunc;
-  final Function(int id, String paid) paidFunc;
 
   const TimeTaskListItem ({
     super.key,
@@ -22,11 +21,10 @@ class TimeTaskListItem extends StatefulWidget {
     required this.client,
     required this.date,
     required this.hours,
-    required this.paid,
+    required this.invoiced,
     required this.rowColor,
     required this.deleteFunc,
     required this.editFunc,
-    required this.paidFunc,
   });
 
   State<TimeTaskListItem> createState() => _TimeTaskListItemState();
@@ -126,43 +124,30 @@ class _TimeTaskListItemState extends State<TimeTaskListItem> {
               flex: 1,
               child: Container(
                 padding: EdgeInsets.only(
-                  left: 3
+                  left: 3,
+                  right: 10
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Checkbox(
-                      value: widget.paid == "true" ? true : false, 
-                      shape: CircleBorder(),
-                      activeColor: Theme.of(context).highlightColor,
-                      checkColor: Theme.of(context).primaryColorDark,
-                      onChanged: (bool? newValue) {
-                        widget.paidFunc(widget.id, newValue.toString());
-                      } 
+                    IconButton(
+                      icon: Icon(
+                        Icons.delete_rounded,
+                        color: Color.fromARGB(255, 201, 3, 3),
+                      ),
+                      onPressed: () {
+                        widget.deleteFunc(widget.id, true);
+                      },
                     ),
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.delete_rounded,
-                            color: Color.fromARGB(255, 201, 3, 3),
-                          ),
-                          onPressed: () {
-                            widget.deleteFunc(widget.id, true);
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.edit_rounded,
-                            color: Theme.of(context).highlightColor,
-                          ),
-                          onPressed: () {
-                            widget.editFunc(widget.id, true, widget.task, widget.client, widget.pos, int.parse(widget.hours), widget.date);
-                          },
-                        ),
-                      ],
-                    ),
-                    
+                    IconButton(
+                      icon: Icon(
+                        Icons.edit_rounded,
+                        color: Theme.of(context).highlightColor,
+                      ),
+                      onPressed: () {
+                        widget.editFunc(widget.id, true, widget.task, widget.client, widget.pos, int.parse(widget.hours), widget.date);
+                      },
+                    ),                    
                   ],
                 ),
               )

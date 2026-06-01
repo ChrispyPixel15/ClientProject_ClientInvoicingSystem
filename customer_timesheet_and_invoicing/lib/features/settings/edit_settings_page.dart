@@ -19,6 +19,7 @@ class _EditSettingsState extends State<EditSettings> {
   final TextEditingController _busNameController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _recentInvoice = TextEditingController();
   final TextEditingController _vatNumberController = TextEditingController();
   final TextEditingController _vatPercentageController = TextEditingController();
   final TextEditingController _streetAddressController = TextEditingController();
@@ -42,8 +43,9 @@ class _EditSettingsState extends State<EditSettings> {
       user = result;
       _nameController.text = result!['name'] == null ? "" : result['name'];
       _busNameController.text = result['business_name'] ?? result['business_name'];
-      _numberController.text = result['number'] ?? result['number'];
+      _numberController.text = result['number'].toString();
       _emailController.text = result['email'] ?? result['email'];
+      _recentInvoice.text = result['recent_invoice'].toString();
       _vatNumberController.text = result['vat_number'].toString();
       _vatPercentageController.text = result['vat_percentage'].toString();
       _streetAddressController.text = result['street_address'] ?? result['street_address'];
@@ -64,6 +66,7 @@ class _EditSettingsState extends State<EditSettings> {
       'business_name': _busNameController.text,
       'number': _numberController.text,
       'email': _emailController.text,
+      'recent_invoice': int.parse(_recentInvoice.text),
       'vat_registered': vatReg == true ? "true" : "false",
       'vat_number': int.parse(_vatNumberController.text),
       'vat_percentage': int.parse(_vatPercentageController.text),
@@ -94,6 +97,7 @@ class _EditSettingsState extends State<EditSettings> {
     _branchCodeController.dispose();
     _bicController.dispose();
     _accountNumberController.dispose();
+    _recentInvoice.dispose();
     super.dispose();
   }
 
@@ -107,7 +111,7 @@ class _EditSettingsState extends State<EditSettings> {
               padding: EdgeInsets.only(
                 left: 50,
                 right: 50,
-                top: 50
+                top: 5
               ),
               child: Column(
                 children: [
@@ -185,6 +189,22 @@ class _EditSettingsState extends State<EditSettings> {
                       ),
                       CustomTextInput(
                         labelName: "", hintText: "Email...", password: false, inputController: _emailController
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Last Invoice Number:",
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18
+                        ),
+                      ),
+                      CustomTextInput(
+                        labelName: "", hintText: "Invoice Number...", password: false, inputController: _recentInvoice
                       )
                     ],
                   ),
@@ -348,7 +368,7 @@ class _EditSettingsState extends State<EditSettings> {
               padding: EdgeInsets.only(
                 left: 50,
                 right: 50,
-                top: 50
+                top: 5
               ),
               child: Column(
                 children: [

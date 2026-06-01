@@ -101,6 +101,17 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
+      bottomNavigationBar: BottomAppBar(
+        color: Theme.of(context).primaryColor,
+        height: 48,
+        child: Text(
+          "\u00a9 ${DateTime.now().year} Chris Designed. All Rights Reserved.",
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodySmall?.color,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }

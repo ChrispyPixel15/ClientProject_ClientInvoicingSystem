@@ -99,7 +99,7 @@ class _TimesheetState extends State<Timesheet> {
       'client_fk': client,
       'date': date,
       'hours': hours,
-      'paid': "false",
+      'invoiced': "false",
     });
     await loadTimesheetTasks();
   }
@@ -116,13 +116,6 @@ class _TimesheetState extends State<Timesheet> {
       'client_fk': client,
       'date': date,
       'hours': hours,
-    });
-    await loadTimesheetTasks();
-  }
-
-  Future<void> updatePaid(int id, String paid) async {
-    await timesheetTaskServices.updateTimesheetTask(id, {
-      'paid': paid,
     });
     await loadTimesheetTasks();
   }
@@ -196,20 +189,16 @@ class _TimesheetState extends State<Timesheet> {
       });      
     }
 
-    void sortByPaid() {
+    void sortByInvoiced() async {
+      await loadTimesheetTasks();
       var changeableList = List<Map<String, dynamic>>.from(timesheetTaskList);
-      String target = "true";
-      changeableList.sort((a, b) {
-        final paidA = a["paid"];
-        final paidB = b["paid"];
-        if (paidA == target && paidB != target) return -1;
-        if (paidA != target && paidB == target) return 1;
-        return paidA.compareTo(paidB);
-      });
+      var newList = List<Map<String, dynamic>>.from(changeableList.where((item) {
+        return item["invoiced"].contains("false");
+      }));
 
       setState(() {
-        timesheetTaskList = changeableList;
-      });      
+        timesheetTaskList = newList;
+      });         
     }
 
     void sortByPos() {
@@ -457,7 +446,7 @@ class _TimesheetState extends State<Timesheet> {
                                   ),
                                 ),
                                 child: Text(
-                                  "Paid Invoice",
+                                  "Purchase Order Numbers",
                                   style: TextStyle(
                                     color: Theme.of(context).textTheme.bodySmall?.color,
                                     fontSize: 14,
@@ -465,7 +454,7 @@ class _TimesheetState extends State<Timesheet> {
                                   ),
                                 ),
                                 onPressed: () {
-                                  sortByPaid();
+                                  sortByPos();
                                 },
                               )
                             ),
@@ -484,7 +473,7 @@ class _TimesheetState extends State<Timesheet> {
                                   ),
                                 ),
                                 child: Text(
-                                  "Purchase Order Numbers",
+                                  "Invoiced",
                                   style: TextStyle(
                                     color: Theme.of(context).textTheme.bodySmall?.color,
                                     fontSize: 14,
@@ -492,7 +481,7 @@ class _TimesheetState extends State<Timesheet> {
                                   ),
                                 ),
                                 onPressed: () {
-                                  sortByPos();
+                                  sortByInvoiced();
                                 },
                               )
                             ),
@@ -670,7 +659,7 @@ class _TimesheetState extends State<Timesheet> {
                                         bottom: 5
                                       ),
                                       child: Text(
-                                        "Paid",
+                                        "",
                                         style: TextStyle(
                                           color: Theme.of(context).textTheme.bodySmall?.color,
                                         ),
@@ -691,11 +680,10 @@ class _TimesheetState extends State<Timesheet> {
                                       client: task['client_fk'], 
                                       date: task['date'], 
                                       hours: task['hours'].toString(), 
-                                      paid: task['paid'], 
+                                      invoiced: task['invoiced'], 
                                       rowColor: Theme.of(context).primaryColor, 
                                       deleteFunc: activateDelete,
                                       editFunc: activateEdit,
-                                      paidFunc: updatePaid
                                     )
                                 ],
                               ),
