@@ -77,7 +77,7 @@ class AppDatabase {
         id TEXT PRIMARY KEY,
         client_bus_name TEXT,
         client_contact_person TEXT,
-        client_contact_number STRING,
+        client_contact_number TEXT,
         client_email TEXT,
         client_vatNumber INTEGER,
         client_street_address TEXT,

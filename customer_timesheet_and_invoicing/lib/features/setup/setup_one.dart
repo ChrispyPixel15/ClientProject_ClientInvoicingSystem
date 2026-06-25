@@ -12,7 +12,7 @@ class SetupOne extends StatefulWidget {
     String? userEmail,
     String? vatRegistered,
     int? vatNum, 
-    int? vatPercent,
+    int? vatPercentage,
     int? recentInvoice,
     String? streetAddress, 
     String? city, 
@@ -176,7 +176,7 @@ class _SetupOneState extends State<SetupOne> {
                     userEmail: _emailController.text,
                     vatRegistered: widget.vatRegistered.toString(),
                     vatNum: int.parse(_vatNumberController.text),
-                    vatPercent: int.parse(_vatPercentageController.text),
+                    vatPercentage: int.parse(_vatPercentageController.text),
                     recentInvoice: int.parse(_invoiceController.text),
                   );
                   widget.onPressed();

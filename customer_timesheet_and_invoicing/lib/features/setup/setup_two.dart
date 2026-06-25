@@ -10,7 +10,7 @@ class SetupTwo extends StatefulWidget {
     String? userEmail,
     String? vatRegistered,
     int? vatNum, 
-    int? vatPercent,
+    int? vatPercentage,
     int? recentInvoice,
     String? streetAddress, 
     String? city, 
@@ -21,7 +21,7 @@ class SetupTwo extends StatefulWidget {
     int? bic,
     int? accountNumber, 
     String? theme, 
-    String? password,
+    String? password, 
   }) updateUser;
 
   const SetupTwo({

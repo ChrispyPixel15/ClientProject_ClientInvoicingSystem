@@ -30,7 +30,7 @@ class _SetupPageState extends State<SetupPage> {
     String? userEmail,
     String? vatRegistered,
     int? vatNum, 
-    int? vatPercent,
+    int? vatPercentage,
     int? recentInvoice,
     String? streetAddress, 
     String? city, 
@@ -51,6 +51,7 @@ class _SetupPageState extends State<SetupPage> {
       if (userEmail != null) _draft.email = userEmail;
       if (vatRegistered != null) _draft.vatRegistered = vatRegistered;
       if (vatNum != null) _draft.vatNumber = vatNum;
+      if (vatPercentage != null) _draft.vatPercentage = vatPercentage;
       if (recentInvoice != null) _draft.recentInvoice = recentInvoice;
       if (streetAddress != null) _draft.streetAddress = streetAddress;
       if (city != null) _draft.city = city;
@@ -85,6 +86,7 @@ class _SetupPageState extends State<SetupPage> {
       'vat_registered': _draft.vatRegistered,
       'vat_number': _draft.vatNumber,
       'vat_percentage': _draft.vatPercentage,
+      'recent_invoice': _draft.recentInvoice,
       'street_address': _draft.streetAddress,
       'city': _draft.city,
       'suburb': _draft.suburb,

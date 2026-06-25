@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:customer_timesheet_and_invoicing/core/text_input.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/client_creation_services.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/invoice_creation_services.dart';
@@ -6,9 +9,13 @@ import 'package:customer_timesheet_and_invoicing/data/services/user_creation_ser
 import 'package:customer_timesheet_and_invoicing/features/clients/components/client_list_invoice.dart';
 import 'package:customer_timesheet_and_invoicing/features/clients/components/client_task_list_items.dart';
 import 'package:customer_timesheet_and_invoicing/features/clients/components/invoice_generator_client_task.dart';
+import 'package:customer_timesheet_and_invoicing/features/clients/invoices/invoice_template.dart';
 import 'package:customer_timesheet_and_invoicing/features/settings/settings_page.dart';
 import 'package:customer_timesheet_and_invoicing/features/timesheet/components/timesheet_task_item.dart';
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf_maker/pdf_maker.dart';
 
 class ClientProfile extends StatefulWidget {
   final String clientID;
@@ -37,6 +44,7 @@ class _ClientProfileState extends State<ClientProfile> {
   Map<String, dynamic>? currentClient;
   List<Map<String, dynamic>> currentClientTaskList = [];
   List<Map<String, dynamic>> currentClientInvoices = [];
+  List<Map<String, dynamic>> selectedInvoiceData = [];
 
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _taskListController = TextEditingController();
@@ -61,7 +69,7 @@ class _ClientProfileState extends State<ClientProfile> {
       user = result;
       debugPrint(user.toString());
       int tempinv = result!["recent_invoice"];
-      inv = tempinv + 1;
+      inv = tempinv;
       debugPrint(result.toString());
     });
   }
@@ -161,6 +169,7 @@ class _ClientProfileState extends State<ClientProfile> {
 
   Future<void> addTasktoInvoice(Map<String, dynamic> values) async {
     await invoiceServices.addInvoiceItem(values, inv);
+    getSelectedInvoice(inv);
   }
 
   Future<void> deleteTaskFromInvoice(String task) async {
@@ -178,15 +187,76 @@ class _ClientProfileState extends State<ClientProfile> {
     getClientInvoices();
   }
 
-  Future<void> getSelectedInvoice() async {
-
+  Future<void> getSelectedInvoice(int invoiceNum) async {
+    final result = await invoiceServices.getInvoiceData(invoiceNum);
+    setState(() {
+      selectedInvoiceData = result;
+      debugPrint(selectedInvoiceData.toString());
+    });
   }
 
   Future<void> updateTimeTaskInvoiced(int id, bool invoiced) async {
     await timesheetTaskServices.updateTimesheetTask(id, {
       'invoiced': invoiced.toString(),
     });
+    getClientTaskList();
   }
+
+  Future<void> saveAndOpen(Uint8List file, String fileName) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final customDir = Directory('${dir.path}/SavedInvoices');
+    if (!await customDir.exists()) {
+      await customDir.create(recursive: true);
+    }
+    final savedFile = File('${customDir.path}/$fileName.pdf');
+    await savedFile.writeAsBytes(file);
+
+    await OpenFile.open('${customDir.path}/$fileName.pdf');
+  }
+
+  Future<void> createPDF() async {
+      getSelectedInvoice(inv);
+
+      PDFMaker maker = PDFMaker();
+
+      maker.createPDF(
+        InvoiceTemplate(
+          invoiceNumber: inv,
+          clientContactPerson: currentClient!['client_contact_person'],
+          clientContactNumber: currentClient!['client_contact_number'].toString(),
+          clientContactEmail: currentClient!['client_email'],
+          clientVatNumber: currentClient!['client_vatNumber'].toString(),
+          quotedPrice: currentClient!['client_price_ph'],
+          clientStreet: currentClient!['client_street_address'],
+          clientCity: currentClient!['client_city'],
+          clientSuburb: currentClient!['client_suburb'],
+          clientPostal: currentClient!['client_postal_code'].toString(),
+          userName: user!['name'],
+          userNumber: user!['number'].toString(),
+          userEmail: user!['email'],
+          userVatNumber: user!['vat_number'].toString(),
+          userStreet: user!['street_address'],
+          userCity: user!['city'],
+          userSuburb: user!['suburb'],
+          userPostal: user!['postal_code'].toString(),
+          selectedInvoiceData: selectedInvoiceData,
+          userAccountnum: user!['account_number'].toString(),
+          userBankName: user!['bank'],
+          userAccountName: user!['account_number'].toString(),
+          userBranchCode: user!['branch_code'].toString(),
+          userBic: user!['bic'].toString(),
+        ),
+        setup: PageSetup(
+          context: context,
+          quality: 4.0,
+          scale: 1.0,
+          pageFormat: PageFormat.a4,
+          margins: 40
+        )
+      ).then((file) {
+        saveAndOpen(file, 'Invoice $inv');
+      });
+    }
 
   @override
   void dispose() {
@@ -936,8 +1006,8 @@ class _ClientProfileState extends State<ClientProfile> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            deleteInvoiceItem(inv);
                             deleteInvoiceDataBase(inv);
+                            deleteInvoiceItem(inv);                            
                             deleteInv = false;
                           },
                           style: ElevatedButton.styleFrom(
@@ -1059,7 +1129,25 @@ class _ClientProfileState extends State<ClientProfile> {
                     SizedBox(
                       height: 20,
                     ),
-                    CustomTextInput(labelName: "Invoice Number", hintText: "Invoice Number...", password: false, inputController: _invoiceNUmberController),
+                    Column(
+                      children: [
+                        Text(
+                          "Invoice Number:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20
+                          ),
+                        ),
+                        Text(
+                          inv.toString(),
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
                     SizedBox(
                       height: 20,
                     ),
@@ -1126,6 +1214,7 @@ class _ClientProfileState extends State<ClientProfile> {
                                 genInv = false;
                               });
                               clearControllers();
+                              createPDF();
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).primaryColorLight,

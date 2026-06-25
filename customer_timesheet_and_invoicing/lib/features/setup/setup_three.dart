@@ -11,7 +11,7 @@ class SetupThree extends StatefulWidget {
     String? userEmail,
     String? vatRegistered,
     int? vatNum, 
-    int? vatPercent,
+    int? vatPercentage,
     int? recentInvoice,
     String? streetAddress, 
     String? city, 
