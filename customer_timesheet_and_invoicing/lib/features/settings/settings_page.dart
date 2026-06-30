@@ -30,6 +30,8 @@ class _SettingsState extends State<Settings> {
   List<Map<String, dynamic>> taskList = [];
   List<Map<String, dynamic>> posList = [];
 
+  final TextEditingController _emailController =  TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -43,7 +45,15 @@ class _SettingsState extends State<Settings> {
     setState(() {
       user = result;
       debugPrint(result.toString());
+      _emailController.text = result!['default_email'];
     });
+  }
+
+  Future<void> updateDefaultEmail(String email) async {
+    await userCreationServices.updateUser({
+      'default_email': email,
+    });
+    getUserData();
   }
 
   Future<void> loadTasks() async {
@@ -175,7 +185,7 @@ class _SettingsState extends State<Settings> {
                         ),
                       ),
                       Text(
-                        user?["number"].toString() ?? "",
+                        user?["number"].toString().padLeft(10, '0') ?? "",
                         style: TextStyle(
                           color: Theme.of(context).textTheme.bodySmall?.color,
                           fontSize: 18
@@ -554,62 +564,114 @@ class _SettingsState extends State<Settings> {
                   ),
                   SizedBox(height: 25,),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).primaryColorLight,
-                          foregroundColor: Theme.of(context).primaryColorDark,
-                          elevation: 5,
-                          padding: EdgeInsets.symmetric(
-                            vertical: 15,
-                            horizontal: 30
-                          )
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            editTasks = true;
-                          });
-                        }, 
-                        child: Text(
-                          "Edit Task List",
-                          style: TextStyle(
-                            color: Theme.of(context).textTheme.bodySmall?.color,
-                            fontSize: 18
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColorLight,
+                              foregroundColor: Theme.of(context).primaryColorDark,
+                              elevation: 5,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 30
+                              )
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                editTasks = true;
+                              });
+                            }, 
+                            child: Text(
+                              "Edit Task List",
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontSize: 18
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
+                      ),
+                      SizedBox(width: 10,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColorLight,
+                              foregroundColor: Theme.of(context).primaryColorDark,
+                              elevation: 5,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 30
+                              )
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                editPOS = true;
+                              });                          
+                            }, 
+                            child: Text(
+                              "Edit POS List",
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontSize: 18
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  SizedBox(height: 10,),
+                  SizedBox(height: 40,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).primaryColorLight,
-                          foregroundColor: Theme.of(context).primaryColorDark,
-                          elevation: 5,
-                          padding: EdgeInsets.symmetric(
-                            vertical: 15,
-                            horizontal: 30
-                          )
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            editPOS = true;
-                          });                          
-                        }, 
-                        child: Text(
-                          "Edit POS List",
-                          style: TextStyle(
-                            color: Theme.of(context).textTheme.bodySmall?.color,
-                            fontSize: 18
-                          ),
+                      Text(
+                        "Defualt Email Message",
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22
                         ),
                       ),
                     ],
                   ),
+                  SizedBox(height: 25,),
+                  SizedBox(
+                    height: 200,
+                    child: TextField(
+                      controller: _emailController,
+                      expands: true,
+                      maxLines: null,
+                      minLines: null,
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                      ),
+                      textAlignVertical: TextAlignVertical.top,
+                      cursorColor: Theme.of(context).highlightColor,
+                      decoration: InputDecoration(
+                        fillColor: Theme.of(context).primaryColorLight,
+                        filled: true,
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Theme.of(context).highlightColor,
+                            width: 1.0,
+                          )
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Theme.of(context).highlightColor,
+                            width: 1.0,
+                          )
+                        ),
+                      ),
+                      onChanged: (e) {
+                        updateDefaultEmail(e);
+                      },                        
+                    ),
+                  )
                 ],
               ),
             ),

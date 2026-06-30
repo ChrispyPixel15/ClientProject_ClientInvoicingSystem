@@ -87,14 +87,14 @@ class _ClientInvoiceTaskState extends State<ClientInvoiceTask> {
                             'hours': widget.hours,
                             'price_ph': widget.priceph,
                           });
-                          widget.updateInvoiced(widget.id, true);
+                          widget.updateInvoiced(widget.id, true);                          
                         }
                         else {
                           selected = false;
                           widget.deleteTaskFromInv(
                             widget.task
                           );
-                          widget.updateInvoiced(widget.id, false);
+                          widget.updateInvoiced(widget.id, false);                          
                         }
                       });
                     }),

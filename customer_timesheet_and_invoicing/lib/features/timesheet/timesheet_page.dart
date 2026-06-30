@@ -782,7 +782,7 @@ class _TimesheetState extends State<Timesheet> {
                               ),
                             ),
                             controller: _taskListController,
-                            width: screenWidth * 0.25,
+                            width: screenWidth * 0.275,
                             hintText: "Select a Task",
                             trailingIcon: Icon(
                               Icons.keyboard_arrow_down_sharp,
@@ -834,20 +834,6 @@ class _TimesheetState extends State<Timesheet> {
                             ],
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.only(
-                            right: 20
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              addTasks(_taskListController.text);
-                            },
-                            icon: Icon(
-                              Icons.add,
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                            ),
-                          ),
-                        )
                       ],
                     ),
                     SizedBox(
@@ -868,7 +854,7 @@ class _TimesheetState extends State<Timesheet> {
                               ),
                             ),
                             controller: _clientController,
-                            width: screenWidth * 0.25,
+                            width: screenWidth * 0.275,
                             hintText: "Select a Client",
                             trailingIcon: Icon(
                               Icons.keyboard_arrow_down_sharp,
@@ -940,7 +926,7 @@ class _TimesheetState extends State<Timesheet> {
                               ),
                             ),
                             controller: _posController,
-                            width: screenWidth * 0.25,
+                            width: screenWidth * 0.275,
                             hintText: "Select a Purchase Order Number",
                             trailingIcon: Icon(
                               Icons.keyboard_arrow_down_sharp,
@@ -992,20 +978,6 @@ class _TimesheetState extends State<Timesheet> {
                             ],
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.only(
-                            right: 20
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              addPos(_posController.text);
-                            },
-                            icon: Icon(
-                              Icons.add,
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                     SizedBox(
@@ -1035,6 +1007,8 @@ class _TimesheetState extends State<Timesheet> {
                                 _dateController.text.replaceAll("/", "-"),
                                 int.parse(_hoursController.text)
                               );
+                              addTasks(_taskListController.text);
+                              addPos(_posController.text);
                               clearControllers();
                               setState(() {
                                 addTask = false;

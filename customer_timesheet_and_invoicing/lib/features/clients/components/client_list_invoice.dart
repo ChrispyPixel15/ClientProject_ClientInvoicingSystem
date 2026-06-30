@@ -7,7 +7,7 @@ class ClientListInvoice extends StatefulWidget {
   final String paid;
   final Function(int id, bool paid) paidFunc;
   final Function(int invoiceNum, bool delete) deleteFunc;
-  final Function() editFunc;
+  final Function(int invoiceNum) mailFunc;
 
   const ClientListInvoice ({
     super.key,
@@ -17,14 +17,13 @@ class ClientListInvoice extends StatefulWidget {
     required this.paid,
     required this.paidFunc,
     required this.deleteFunc,
-    required this.editFunc
+    required this.mailFunc,
   });
 
   State<ClientListInvoice> createState() => _ClientListInvoiceState();
 }
 
 class _ClientListInvoiceState extends State<ClientListInvoice> {
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -77,7 +76,7 @@ class _ClientListInvoiceState extends State<ClientListInvoice> {
               flex: 1,
               child: Container(
                 padding: EdgeInsets.only(
-                  left: 8
+                  left: 25
                 ),
                 child: Transform.scale(
                   scale: 1.5,
@@ -110,39 +109,40 @@ class _ClientListInvoiceState extends State<ClientListInvoice> {
               ),
             ),
             Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(
-                      left: 8,
-                      right: 8
-                    ),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.delete_rounded,
-                        color: Color.fromARGB(255, 201, 3, 3),
-                      ),
-                      onPressed: () {
-                        widget.deleteFunc(widget.invoiceNum, true);
-                      },
-                    ),
-                  ), 
-                  Container(
-                    padding: EdgeInsets.only(
-                      left: 8,
-                    ),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.edit_rounded,
-                        color: Theme.of(context).highlightColor,
-                      ),
-                      onPressed: () {
-                        widget.editFunc();
-                      },
-                    ),
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(
+                    left: 8,
+                    right: 8
                   ),
-                ],
-              ),                        
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.delete_rounded,
+                      color: Color.fromARGB(255, 201, 3, 3),
+                    ),
+                    onPressed: () {
+                      widget.deleteFunc(widget.invoiceNum, true);
+                    },
+                  ),
+                ), 
+                Container(
+                  padding: EdgeInsets.only(
+                    left: 8,
+                    right: 8
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.mail_outline_rounded,
+                      color: Theme.of(context).highlightColor,
+                    ),
+                    onPressed: () {
+                      widget.mailFunc(widget.invoiceNum);
+                    },
+                  ),
+                ), 
+              ],
+            ),                       
           ],
         ),
       );

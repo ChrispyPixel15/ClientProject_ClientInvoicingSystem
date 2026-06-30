@@ -33,6 +33,7 @@ class _ClientsState extends State<Clients> {
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _vatNumberController = TextEditingController();
   final TextEditingController _quotePriceController = TextEditingController();
+  final TextEditingController _paymentTermsController = TextEditingController();
   List<Map<String, dynamic>> clientList = [];
 
   @override
@@ -59,6 +60,7 @@ class _ClientsState extends State<Clients> {
     String city,
     int postalCode,
     double quotePrice,
+    int paymentTerm,
   ) async {
     String newIDLetters = name.substring(0, 2).toUpperCase();
     String newIDNumbers = DateTime.now().hashCode.toString();
@@ -75,6 +77,7 @@ class _ClientsState extends State<Clients> {
       'client_city': city,
       'client_postal_code': postalCode,
       'client_price_ph': quotePrice,
+      'client_payment_term': paymentTerm,
       'status': "active",
       'unpaid_invoices': 0,
     });
@@ -104,7 +107,8 @@ class _ClientsState extends State<Clients> {
     String suburb, 
     String city, 
     int postalCode,
-    double quotePrice) async {
+    double quotePrice,
+    int paymentTerm,) async {
     await clientServices.updateClient(id, {
       'client_bus_name': name,
       'client_contact_person': contactPerson,
@@ -116,6 +120,7 @@ class _ClientsState extends State<Clients> {
       'client_city': city,
       'client_postal_code': postalCode,
       'client_price_ph': quotePrice,
+      'client_payment_term': paymentTerm,
     });
     loadClients();
   }
@@ -133,6 +138,7 @@ class _ClientsState extends State<Clients> {
     _postalCodeController.dispose();
     _searchController.dispose();
     _quotePriceController.dispose();
+    _paymentTermsController.dispose();
     super.dispose();
   }
 
@@ -160,6 +166,7 @@ class _ClientsState extends State<Clients> {
       _cityController.text = result["client_city"];
       _postalCodeController.text = result["client_postal_code"].toString();
       _quotePriceController.text = result["client_price_ph"].toString();
+      _paymentTermsController.text = result["client_payment_term"].toString();
       setState(() {
         editClient = edit;
         selectedClientID = id;
@@ -177,6 +184,7 @@ class _ClientsState extends State<Clients> {
       _cityController.clear();
       _postalCodeController.clear();
       _quotePriceController.clear();
+      _paymentTermsController.clear();
     }
 
     return Stack(
@@ -418,8 +426,8 @@ class _ClientsState extends State<Clients> {
                 color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
               ),
               padding: EdgeInsets.only(
-                top: screenHeight * 0.15,
-                bottom: screenHeight * 0.15,
+                top: screenHeight * 0.11,
+                bottom: screenHeight * 0.11,
                 left: screenWidth * 0.20,
                 right: screenWidth * 0.20,
               ),
@@ -546,6 +554,19 @@ class _ClientsState extends State<Clients> {
                       ),
                     ),
                     SizedBox(height: 20,),
+                    Container(
+                      padding: EdgeInsets.only(
+                        left: 20,
+                        right: 20
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CustomTextInput(labelName: "Payment Term in Days", hintText: "Payment Term...", password: false, inputController: _paymentTermsController),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -565,7 +586,8 @@ class _ClientsState extends State<Clients> {
                                 _suburbController.text, 
                                 _cityController.text, 
                                 int.parse(_postalCodeController.text),
-                                double.parse(_quotePriceController.text)
+                                double.parse(_quotePriceController.text),
+                                int.parse(_paymentTermsController.text),
                               );
                               setState(() {
                                 addClient = false;
@@ -841,6 +863,19 @@ class _ClientsState extends State<Clients> {
                       ),
                     ),
                     SizedBox(height: 20,),
+                    Container(
+                      padding: EdgeInsets.only(
+                        left: 20,
+                        right: 20
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CustomTextInput(labelName: "Payment Term in Days", hintText: "Payment Term...", password: false, inputController: _paymentTermsController),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -862,6 +897,7 @@ class _ClientsState extends State<Clients> {
                                 _cityController.text, 
                                 int.parse(_postalCodeController.text),
                                 double.parse(_quotePriceController.text),
+                                int.parse(_paymentTermsController.text),
                               );
                               setState(() {
                                 editClient = false;

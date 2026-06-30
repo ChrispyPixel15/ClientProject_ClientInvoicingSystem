@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pdf_maker/pdf_maker.dart';
 
 class InvoiceTemplate extends BlankPage {
@@ -7,6 +8,7 @@ class InvoiceTemplate extends BlankPage {
   final String clientContactNumber;
   final String clientContactEmail;
   final String clientVatNumber;
+  final int termDays;
   final double quotedPrice;
   final String clientStreet;
   final String clientCity;
@@ -34,6 +36,7 @@ class InvoiceTemplate extends BlankPage {
     required this.clientContactNumber,
     required this.clientContactEmail,
     required this.clientVatNumber,
+    required this.termDays,
     required this.quotedPrice,
     required this.clientStreet,
     required this.clientCity,
@@ -60,6 +63,7 @@ class InvoiceTemplate extends BlankPage {
     
     final double totalCost = selectedInvoiceData.fold(0, (previous, current) => previous + (current['price_ph']*current['hours']));
     final String currentInvoice = invoiceNumber.toString().padLeft(6, '0');
+    final DateTime today = DateTime.now();
 
     return Container(
       decoration: BoxDecoration(
@@ -113,7 +117,7 @@ class InvoiceTemplate extends BlankPage {
                     textAlign: TextAlign.left,
                   ),
                   Text(
-                    userNumber,
+                    userNumber.padLeft(10, "0"),
                     textAlign: TextAlign.left,
                   ),
                   Text(
@@ -153,7 +157,7 @@ class InvoiceTemplate extends BlankPage {
                     textAlign: TextAlign.left,
                   ),
                   Text(
-                    clientContactNumber,
+                    clientContactNumber.padLeft(10, "0"),
                     textAlign: TextAlign.left,
                   ),
                   Text(
@@ -170,11 +174,11 @@ class InvoiceTemplate extends BlankPage {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Date One',
+                    DateFormat('dd-MM-yyyy').format(today),
                     textAlign: TextAlign.left,
                   ),
                   Text(
-                    'Date Two',
+                    DateFormat('dd-MM-yyyy').format(today.add(Duration(days: termDays))),
                     textAlign: TextAlign.left,
                   ),
                 ],

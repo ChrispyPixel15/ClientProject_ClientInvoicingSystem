@@ -50,7 +50,8 @@ class AppDatabase {
         bic INTEGER,
         account_number INTEGER,
         theme TEXT,
-        password TEXT
+        password TEXT,
+        default_email TEXT
       )
       '''
     );
@@ -85,6 +86,7 @@ class AppDatabase {
         client_city TEXT,
         client_postal_code INTEGER,
         client_price_ph FLOAT,
+        client_payment_term INTEGER,
         notes TEXT,
         status TEXT,
         unpaid_invoices INTEGER

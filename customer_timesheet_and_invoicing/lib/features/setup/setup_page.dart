@@ -97,6 +97,7 @@ class _SetupPageState extends State<SetupPage> {
       'account_number': _draft.accountNumber,
       'theme': 'dark',
       'password': _draft.password,
+      'default_email': "",
     });
 
     var user = userService.getUserProfile();

@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf_maker/pdf_maker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ClientProfile extends StatefulWidget {
   final String clientID;
@@ -45,6 +46,7 @@ class _ClientProfileState extends State<ClientProfile> {
   List<Map<String, dynamic>> currentClientTaskList = [];
   List<Map<String, dynamic>> currentClientInvoices = [];
   List<Map<String, dynamic>> selectedInvoiceData = [];
+  List<Map<String, dynamic>> uninvoicedTasks = [];
 
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _taskListController = TextEditingController();
@@ -123,15 +125,42 @@ class _ClientProfileState extends State<ClientProfile> {
         return invoice["client_fk"].contains(currentClient!["client_bus_name"]);
       }));
     });
+    debugPrint(result.toString());
   }
 
-  Future<void> generateInvoice() async {
+  Future<void> getUninvoicedTasks() async {
+    final result = await timesheetTaskServices.getTimesheetTasks();
+    List<Map<String, dynamic>> tempList = List<Map<String, dynamic>>.from(result.where((item) {
+      return item["client_fk"].contains(currentClient!["client_bus_name"]);
+    }));
+    setState(() {
+      uninvoicedTasks = List<Map<String, dynamic>>.from(tempList.where((tem) {
+        return tem["invoiced"].contains("false");
+      }));
+    });
+  }
+
+  Future<void> addUnpaidAmountInvoices() async {
+     await clientServices.updateClient(widget.clientID, {
+      'unpaid_invoices': currentClient!['unpaid_invoices'] + 1
+    });
+    loadClient();
+  }
+
+  Future<void> removeUnpaidAmountInvoices() async {
+     await clientServices.updateClient(widget.clientID, {
+      'unpaid_invoices': currentClient!['unpaid_invoices'] - 1
+    });
+    loadClient();
+  }
+
+  Future<void> generateInvoice(String directory) async {
     await invoiceServices.createInvoice({
       'client_fk': currentClient!["client_bus_name"],
       'invoice_number': inv,
       'date': '${DateTime.now().day}-${DateTime.now().month}-${DateTime.now().year}',
       'paid': 'false',
-      'dir': ""
+      'dir': directory
     });
     await userCreationServices.updateUser({
       'recent_invoice': user!['recent_invoice'] + 1,
@@ -140,7 +169,7 @@ class _ClientProfileState extends State<ClientProfile> {
     debugPrint(result.toString());
     await getUserData();
     await getClientInvoices();
-    getClientTaskList();
+    addUnpaidAmountInvoices();
   }
 
   Future<void> generateInvoiceDB(int invoiceNumber) async {
@@ -157,6 +186,8 @@ class _ClientProfileState extends State<ClientProfile> {
   }
 
   Future<void> deleteInvoiceItem(int invoiceNum) async {
+    deleteFile(invoiceNum);
+    removeUnpaidAmountInvoices();
     await invoiceServices.deleteInvoice(invoiceNum);
     await invoiceServices.deleteInvoiceDB(invoiceNum);
     await userCreationServices.updateUser({
@@ -165,6 +196,15 @@ class _ClientProfileState extends State<ClientProfile> {
     await getUserData();
     await getClientInvoices();
     getClientTaskList();
+  }
+
+  Future<void> deleteFile(int invoiceNum) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final customDir = Directory('${dir.path}/SavedInvoices');
+    final file = File('${customDir.path}/Invoice $invoiceNum.pdf');
+    if (await file.exists()) {
+      file.delete();
+    }
   }
 
   Future<void> addTasktoInvoice(Map<String, dynamic> values) async {
@@ -176,14 +216,16 @@ class _ClientProfileState extends State<ClientProfile> {
     await invoiceServices.deleteInvoiceItem(task, inv);
   }
 
-  Future<void> editInvoiceItem() async {
-    
-  }
-
   Future<void> payInvoice(int id, bool paid) async {
     await invoiceServices.updateInvoice(id, {
       'paid': paid.toString(),
     });
+    if (paid == true) {
+      removeUnpaidAmountInvoices();
+    }
+    else {
+      addUnpaidAmountInvoices();
+    }
     getClientInvoices();
   }
 
@@ -210,8 +252,14 @@ class _ClientProfileState extends State<ClientProfile> {
     }
     final savedFile = File('${customDir.path}/$fileName.pdf');
     await savedFile.writeAsBytes(file);
-
+    generateInvoice('${customDir.path}/$fileName.pdf');
     await OpenFile.open('${customDir.path}/$fileName.pdf');
+  }
+
+  Future<void> openFile(int invoiceNum) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final customDir = Directory('${dir.path}/SavedInvoices');
+    await OpenFile.open('${customDir.path}/Invoice $invoiceNum.pdf');
   }
 
   Future<void> createPDF() async {
@@ -226,6 +274,7 @@ class _ClientProfileState extends State<ClientProfile> {
           clientContactNumber: currentClient!['client_contact_number'].toString(),
           clientContactEmail: currentClient!['client_email'],
           clientVatNumber: currentClient!['client_vatNumber'].toString(),
+          termDays: currentClient!['client_payment_term'],
           quotedPrice: currentClient!['client_price_ph'],
           clientStreet: currentClient!['client_street_address'],
           clientCity: currentClient!['client_city'],
@@ -257,6 +306,18 @@ class _ClientProfileState extends State<ClientProfile> {
         saveAndOpen(file, 'Invoice $inv');
       });
     }
+
+  Future<void> mailInvoice(int invoiceNum) async {
+     final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: currentClient!['client_email'],
+      queryParameters: {
+        'subject': 'Invoice $invoiceNum',
+        'body': user!["default_email"]
+      }
+    );
+    await launchUrl(emailLaunchUri);
+  }
 
   @override
   void dispose() {
@@ -375,7 +436,7 @@ class _ClientProfileState extends State<ClientProfile> {
                                     ),
                                   ),
                                   Text(
-                                    currentClient == null ? "" : currentClient!['client_contact_number'].toString(),
+                                    currentClient == null ? "" : currentClient!['client_contact_number'].toString().padLeft(10, '0'),
                                     style: TextStyle(
                                       color: Theme.of(context).textTheme.bodySmall?.color,
                                       fontSize: 16,
@@ -436,6 +497,26 @@ class _ClientProfileState extends State<ClientProfile> {
                                   ),
                                   Text(
                                     currentClient == null ? "" : currentClient!['client_price_ph'].toString(),
+                                    style: TextStyle(
+                                      color: Theme.of(context).textTheme.bodySmall?.color,
+                                      fontSize: 16,
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Payment Term (days): ",
+                                    style: TextStyle(
+                                      color: Theme.of(context).textTheme.bodySmall?.color,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    currentClient == null ? "" : currentClient!['client_payment_term'].toString(),
                                     style: TextStyle(
                                       color: Theme.of(context).textTheme.bodySmall?.color,
                                       fontSize: 16,
@@ -825,6 +906,7 @@ class _ClientProfileState extends State<ClientProfile> {
                                         });
                                         inv = user!["recent_invoice"] + 1;
                                         generateInvoiceDB(user!["recent_invoice"] + 1);
+                                        getUninvoicedTasks();
                                       },
                                       child: Text(
                                         "Generate Invoice",
@@ -839,7 +921,12 @@ class _ClientProfileState extends State<ClientProfile> {
                             ),
                           ),
                           for(var inv in currentClientInvoices) 
-                            ClientListInvoice(invoiceNum: inv['invoice_number'], id: inv['id'], date: inv['date'], paid: inv['paid'], paidFunc: payInvoice, deleteFunc: activateDeleteInv, editFunc: editInvoiceItem)
+                            InkWell(
+                              onTap: () {
+                                openFile(inv['invoice_number']);
+                              },
+                              child: ClientListInvoice(invoiceNum: inv['invoice_number'], id: inv['id'], date: inv['date'], paid: inv['paid'], paidFunc: payInvoice, deleteFunc: activateDeleteInv, mailFunc: mailInvoice,),
+                            )
                         ],
                       ),
                     )
@@ -1184,19 +1271,19 @@ class _ClientProfileState extends State<ClientProfile> {
                               width: 1000,
                               child: Column(
                                 children: [
-                                  for (var task in currentClientTaskList)
-                                    if (task['invoiced'] == "false") 
-                                      ClientInvoiceTask(
-                                        id: task['id'], 
-                                        task: task['task_fk'], 
-                                        pos: task['pos_fk'], 
-                                        date: task['date'], 
-                                        hours: task['hours'], 
-                                        client: currentClient!["client_bus_name"], 
-                                        priceph: currentClient!["client_price_ph"],
-                                        addTaskToInv: addTasktoInvoice,
-                                        deleteTaskFromInv: deleteTaskFromInvoice,
-                                        updateInvoiced: updateTimeTaskInvoiced)
+                                  for (var task in uninvoicedTasks)
+                                    ClientInvoiceTask(
+                                      id: task['id'], 
+                                      task: task['task_fk'], 
+                                      pos: task['pos_fk'], 
+                                      date: task['date'], 
+                                      hours: task['hours'], 
+                                      client: currentClient!["client_bus_name"], 
+                                      priceph: currentClient!["client_price_ph"],
+                                      addTaskToInv: addTasktoInvoice,
+                                      deleteTaskFromInv: deleteTaskFromInvoice,
+                                      updateInvoiced: updateTimeTaskInvoiced,
+                                    )
                                 ],
                               ),
                             ),
@@ -1209,7 +1296,6 @@ class _ClientProfileState extends State<ClientProfile> {
                       children: [
                         ElevatedButton(
                             onPressed: () {
-                              generateInvoice();
                               setState(() {
                                 genInv = false;
                               });
