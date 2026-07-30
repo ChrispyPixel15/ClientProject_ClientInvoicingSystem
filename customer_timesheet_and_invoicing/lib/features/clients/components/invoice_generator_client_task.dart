@@ -81,6 +81,7 @@ class _ClientInvoiceTaskState extends State<ClientInvoiceTask> {
                         if (selected == false) {
                           selected = true;
                           widget.addTaskToInv({
+                            'id': widget.id,
                             'client_fk': widget.client,
                             'pos_fk': widget.pos,
                             'task_name': widget.task,

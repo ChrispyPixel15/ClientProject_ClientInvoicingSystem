@@ -20,6 +20,8 @@ class _TimesheetState extends State<Timesheet> {
 
   int selectedClientID = 0;
 
+  DateTime? taskDate = DateTime.now();
+
   final taskServices = TaskCreationService();
   final clientServices = ClientCreationServices();
   final posServices = PosCreationServices();
@@ -120,6 +122,46 @@ class _TimesheetState extends State<Timesheet> {
     await loadTimesheetTasks();
   }
 
+  Future<void> _selectDate() async {
+    final ThemeData currentTheme = Theme.of(context);
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2022),
+      lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: currentTheme.copyWith(
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: currentTheme.primaryColor,
+              shadowColor: currentTheme.primaryColorDark,
+              headerForegroundColor: currentTheme.highlightColor,
+              subHeaderForegroundColor: currentTheme.highlightColor,
+              dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return currentTheme.highlightColor; // Selected day fill
+                return Colors.transparent;
+              }),
+              dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return currentTheme.primaryColorDark; // Selected day text
+                if (states.contains(WidgetState.disabled)) return currentTheme.primaryColorLight;  // Disabled dates
+                return currentTheme.textTheme.bodySmall?.color;                                         // Standard dates
+              }),
+              weekdayStyle: TextStyle(
+                color: currentTheme.highlightColor
+              )
+            )
+          ),
+          child: child!,
+        );
+      }
+    );
+
+    setState(() {
+      taskDate = pickedDate;
+    });
+  }
+
   @override
   void dispose() {
     _taskListController.dispose();
@@ -150,7 +192,7 @@ class _TimesheetState extends State<Timesheet> {
         _clientController.text = client;
         _posController.text = pos;
         _hoursController.text = hours.toString();
-        _dateController.text = date;
+        taskDate = DateTime.parse(date);
       });
     }
 
@@ -249,27 +291,10 @@ class _TimesheetState extends State<Timesheet> {
                     }, 
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColorLight,
-                      foregroundColor: Theme.of(context).primaryColorDark,
+                      foregroundColor: Theme.of(context).highlightColor,
                     ),
                     child: Text(
                       "New Task",
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.bodySmall?.color,
-                        fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10,),
-                  ElevatedButton(
-                    onPressed: () {
-        
-                    }, 
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColorLight,
-                      foregroundColor: Theme.of(context).primaryColorDark,
-                    ),
-                    child: Text(
-                      "Generate Statement",
                       style: TextStyle(
                         color: Theme.of(context).textTheme.bodySmall?.color,
                         fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
@@ -297,6 +322,10 @@ class _TimesheetState extends State<Timesheet> {
                             color: Theme.of(context).highlightColor,
                             width: 1,
                           ),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            bottomLeft: Radius.circular(10)
+                          ),
                           color: Theme.of(context).primaryColor,
                         ),
                         child: Column(
@@ -314,6 +343,9 @@ class _TimesheetState extends State<Timesheet> {
                                     width: 1,
                                     color: Theme.of(context).highlightColor,
                                   )
+                                ),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10)
                                 ),
                                 color: Theme.of(context).primaryColorDark
                               ),
@@ -333,7 +365,7 @@ class _TimesheetState extends State<Timesheet> {
                                     }, 
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Theme.of(context).primaryColorLight,
-                                      foregroundColor: Theme.of(context).primaryColorDark,
+                                      foregroundColor: Theme.of(context).highlightColor,
                                       minimumSize: Size.zero,
                                       padding: EdgeInsets.only(
                                         top: 2,
@@ -556,6 +588,10 @@ class _TimesheetState extends State<Timesheet> {
                             color: Theme.of(context).highlightColor,
                             width: 1
                           ),
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(10),
+                            bottomRight: Radius.circular(10)
+                          ),
                           color: Theme.of(context).primaryColor,
                         ),
                         child: Column(
@@ -567,6 +603,9 @@ class _TimesheetState extends State<Timesheet> {
                                   bottom: BorderSide(
                                     color: Theme.of(context).highlightColor,
                                   )
+                                ),
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(10)
                                 )
                               ),
                               child: Row(
@@ -983,7 +1022,31 @@ class _TimesheetState extends State<Timesheet> {
                     SizedBox(
                       height: 20,
                     ),
-                    CustomTextInput(labelName: "Date", hintText: "Date...", password: false, inputController: _dateController),
+                    SizedBox(
+                      width: 520,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _selectDate();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColorLight,
+                          foregroundColor: Theme.of(context).highlightColor,
+                          elevation: 5,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 15,
+                            horizontal: 30
+                          )
+                        ),
+                        child: Text(
+                          taskDate.toString().split(' ')[0],
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                            fontSize: 18
+                          ),
+                        ),
+                      ),
+                    ),
                     SizedBox(
                       height: 20,
                     ),
@@ -1004,7 +1067,7 @@ class _TimesheetState extends State<Timesheet> {
                                 _taskListController.text,
                                 _posController.text,
                                 _clientController.text,
-                                _dateController.text.replaceAll("/", "-"),
+                                taskDate.toString().split(' ')[0],
                                 int.parse(_hoursController.text)
                               );
                               addTasks(_taskListController.text);
@@ -1016,7 +1079,7 @@ class _TimesheetState extends State<Timesheet> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).primaryColorLight,
-                              foregroundColor: Theme.of(context).primaryColorDark,
+                              foregroundColor: Theme.of(context).highlightColor,
                               elevation: 5,
                               padding: EdgeInsets.symmetric(
                                 vertical: 15,
@@ -1124,7 +1187,7 @@ class _TimesheetState extends State<Timesheet> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Theme.of(context).primaryColorLight,
-                            foregroundColor: Theme.of(context).primaryColorDark,
+                            foregroundColor: Theme.of(context).highlightColor,
                             elevation: 5,
                             padding: EdgeInsets.symmetric(
                               vertical: 15,
@@ -1187,7 +1250,7 @@ class _TimesheetState extends State<Timesheet> {
                           ),
                           onPressed: () {
                             setState(() {
-                              addTask = false;
+                              editTask = false;
                             });
                             clearControllers();
                           },
@@ -1460,7 +1523,31 @@ class _TimesheetState extends State<Timesheet> {
                     SizedBox(
                       height: 20,
                     ),
-                    CustomTextInput(labelName: "Date", hintText: "Date...", password: false, inputController: _dateController),
+                    SizedBox(
+                      width: 520,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _selectDate();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColorLight,
+                          foregroundColor: Theme.of(context).highlightColor,
+                          elevation: 5,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 15,
+                            horizontal: 30
+                          )
+                        ),
+                        child: Text(
+                          taskDate.toString().split(' ')[0],
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                            fontSize: 18
+                          ),
+                        ),
+                      ),
+                    ),
                     SizedBox(
                       height: 20,
                     ),
@@ -1482,7 +1569,7 @@ class _TimesheetState extends State<Timesheet> {
                                 _taskListController.text,
                                 _posController.text,
                                 _clientController.text,
-                                _dateController.text.replaceAll("/", "-"),
+                                taskDate.toString().split(' ')[0],
                                 int.parse(_hoursController.text)
                               );
                               clearControllers();
@@ -1492,7 +1579,7 @@ class _TimesheetState extends State<Timesheet> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).primaryColorLight,
-                              foregroundColor: Theme.of(context).primaryColorDark,
+                              foregroundColor: Theme.of(context).highlightColor,
                               elevation: 5,
                               padding: EdgeInsets.symmetric(
                                 vertical: 15,

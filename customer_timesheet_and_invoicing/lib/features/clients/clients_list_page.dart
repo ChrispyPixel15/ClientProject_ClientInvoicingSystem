@@ -245,24 +245,45 @@ class _ClientsState extends State<Clients> {
                           ),
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            addClient = true;
-                          });
-                          clearControllers();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).primaryColorLight,
-                          foregroundColor: Theme.of(context).primaryColorDark
-                        ),
-                        child: Text(
-                          "New Client",
-                          style: TextStyle(
-                            color: Theme.of(context).textTheme.bodySmall?.color,
-                            fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                addClient = true;
+                              });
+                              clearControllers();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColorLight,
+                              foregroundColor: Theme.of(context).primaryColorDark
+                            ),
+                            child: Text(
+                              "New Client",
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                              ),
+                            ),
                           ),
-                        ),
+                          SizedBox(width: 10,),
+                          ElevatedButton(
+                            onPressed: () {
+                
+                            }, 
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColorLight,
+                              foregroundColor: Theme.of(context).primaryColorDark,
+                            ),
+                            child: Text(
+                              "Generate Invoice Statement",
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                              ),
+                            ),
+                          ),
+                        ],
                       )
                     ],
                   ),
@@ -280,6 +301,7 @@ class _ClientsState extends State<Clients> {
                         color: Theme.of(context).highlightColor,
                         width: 1
                       ),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
                       color: Theme.of(context).primaryColor
                     ),
                     child: Column(
@@ -297,6 +319,10 @@ class _ClientsState extends State<Clients> {
                                 width: 1,
                                 color: Theme.of(context).highlightColor
                               )
+                            ),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10)
                             ),
                             color: Theme.of(context).primaryColorDark
                           ),
@@ -581,7 +607,7 @@ class _ClientsState extends State<Clients> {
                                 _contactPersonController.text, 
                                 _contactNumberController.text,
                                 _emailController.text, 
-                                int.parse(_vatNumberController.text), 
+                                _vatNumberController.text.trim().isEmpty ? 0 : int.parse(_vatNumberController.text), 
                                 _streetAddressController.text, 
                                 _suburbController.text, 
                                 _cityController.text, 
@@ -891,7 +917,7 @@ class _ClientsState extends State<Clients> {
                                 _contactPersonController.text, 
                                 _contactNumberController.text,
                                 _emailController.text, 
-                                int.parse(_vatNumberController.text), 
+                                _vatNumberController.text.trim().isEmpty ? 0 : int.parse(_vatNumberController.text), 
                                 _streetAddressController.text, 
                                 _suburbController.text, 
                                 _cityController.text, 

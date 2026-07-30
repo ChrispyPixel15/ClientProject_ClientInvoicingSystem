@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:customer_timesheet_and_invoicing/core/text_input.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/client_creation_services.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/invoice_creation_services.dart';
+import 'package:customer_timesheet_and_invoicing/data/services/statement_creation_services.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/timesheet_task_creation_services.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/user_creation_service.dart';
 import 'package:customer_timesheet_and_invoicing/features/clients/components/client_list_invoice.dart';
@@ -31,6 +32,7 @@ class _ClientProfileState extends State<ClientProfile> {
   final timesheetTaskServices = TimesheetTaskCreationServices();
   final invoiceServices = InvoiceCreationServices();
   final userCreationServices = UserProfileServices();
+  final clientStatementServices = StatementCreationServices();
   Map<String, dynamic>? user;
 
   bool editClient = false;
@@ -38,21 +40,28 @@ class _ClientProfileState extends State<ClientProfile> {
   bool deleteInv = false;
   bool editTask = false;
   bool genInv = false;
+  bool genStatement = false;
 
   int taskID = 0;
   int inv = 0;
+
+  String statementStart = "Start Date";
+  String statementEnd = "End Date";
+
+  DateTime? dateOne;
+  DateTime? dateTwo;
 
   Map<String, dynamic>? currentClient;
   List<Map<String, dynamic>> currentClientTaskList = [];
   List<Map<String, dynamic>> currentClientInvoices = [];
   List<Map<String, dynamic>> selectedInvoiceData = [];
   List<Map<String, dynamic>> uninvoicedTasks = [];
+  List<Map<String, dynamic>> currentClientStatementList = [];
 
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _taskListController = TextEditingController();
   final TextEditingController _clientController = TextEditingController();
   final TextEditingController _posController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
   final TextEditingController _hoursController = TextEditingController();
   final TextEditingController _invoiceNUmberController = TextEditingController();
 
@@ -128,6 +137,15 @@ class _ClientProfileState extends State<ClientProfile> {
     debugPrint(result.toString());
   }
 
+  Future<void> getClientStatements() async {
+    final result = await clientStatementServices.getClientStatements();
+    setState(() {
+      currentClientStatementList = List<Map<String, dynamic>>.from(result.where((statement) {
+        return statement["client_fk"].contains(currentClient!["client_bus_name"]);
+      }));
+    });
+  }
+
   Future<void> getUninvoicedTasks() async {
     final result = await timesheetTaskServices.getTimesheetTasks();
     List<Map<String, dynamic>> tempList = List<Map<String, dynamic>>.from(result.where((item) {
@@ -165,8 +183,6 @@ class _ClientProfileState extends State<ClientProfile> {
     await userCreationServices.updateUser({
       'recent_invoice': user!['recent_invoice'] + 1,
     });
-    final result = await invoiceServices.getInvoiceData(inv);
-    debugPrint(result.toString());
     await getUserData();
     await getClientInvoices();
     addUnpaidAmountInvoices();
@@ -174,10 +190,15 @@ class _ClientProfileState extends State<ClientProfile> {
 
   Future<void> generateInvoiceDB(int invoiceNumber) async {
     await invoiceServices.createInvoiceDB(invoiceNumber);
+    final result = invoiceServices.getInvoices();
+    debugPrint("This is the result: ${result.toString()}");
+    final res = invoiceServices.getInvoiceData(invoiceNumber);
+    debugPrint(res.toString());
   }
 
   Future<void> deleteInvoiceDataBase(int invoiceNumber) async {
     final result = await invoiceServices.getInvoiceData(invoiceNumber);
+    debugPrint(result.toString());
     for (var res in result) {
       updateTimeTaskInvoiced(res['id'], false);
     }
@@ -186,6 +207,7 @@ class _ClientProfileState extends State<ClientProfile> {
   }
 
   Future<void> deleteInvoiceItem(int invoiceNum) async {
+    deleteInvoiceDataBase(invoiceNum);
     deleteFile(invoiceNum);
     removeUnpaidAmountInvoices();
     await invoiceServices.deleteInvoice(invoiceNum);
@@ -217,15 +239,22 @@ class _ClientProfileState extends State<ClientProfile> {
   }
 
   Future<void> payInvoice(int id, bool paid) async {
-    await invoiceServices.updateInvoice(id, {
-      'paid': paid.toString(),
-    });
     if (paid == true) {
       removeUnpaidAmountInvoices();
+      await invoiceServices.updateInvoice(id, {
+        'paid': paid.toString(),
+        'date_paid': DateTime.now().toString().split(' ')[0],
+      });
     }
     else {
       addUnpaidAmountInvoices();
+      await invoiceServices.updateInvoice(id, {
+        'paid': paid.toString(),
+        'date_paid': "",
+      });
     }
+    final res = invoiceServices.getInvoices();
+    debugPrint(res.toString());
     getClientInvoices();
   }
 
@@ -282,6 +311,7 @@ class _ClientProfileState extends State<ClientProfile> {
           clientPostal: currentClient!['client_postal_code'].toString(),
           userName: user!['name'],
           userNumber: user!['number'].toString(),
+          vatAmmount: user!['vat_percentage'].toString(),
           userEmail: user!['email'],
           userVatNumber: user!['vat_number'].toString(),
           userStreet: user!['street_address'],
@@ -294,6 +324,7 @@ class _ClientProfileState extends State<ClientProfile> {
           userAccountName: user!['account_number'].toString(),
           userBranchCode: user!['branch_code'].toString(),
           userBic: user!['bic'].toString(),
+          vatReg: user!['vat_registered'],
         ),
         setup: PageSetup(
           context: context,
@@ -319,13 +350,94 @@ class _ClientProfileState extends State<ClientProfile> {
     await launchUrl(emailLaunchUri);
   }
 
+  Future<void> _selectDateOne() async {
+    final ThemeData currentTheme = Theme.of(context);
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2022),
+      lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: currentTheme.copyWith(
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: currentTheme.primaryColor,
+              shadowColor: currentTheme.primaryColorDark,
+              headerForegroundColor: currentTheme.highlightColor,
+              subHeaderForegroundColor: currentTheme.highlightColor,
+              dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return currentTheme.highlightColor; // Selected day fill
+                return Colors.transparent;
+              }),
+              dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return currentTheme.primaryColorDark; // Selected day text
+                if (states.contains(WidgetState.disabled)) return currentTheme.primaryColorLight;  // Disabled dates
+                return currentTheme.textTheme.bodySmall?.color;                                         // Standard dates
+              }),
+              weekdayStyle: TextStyle(
+                color: currentTheme.highlightColor
+              )
+            )
+          ),
+          child: child!,
+        );
+      }
+    );
+
+    setState(() {
+      dateOne = pickedDate;
+      statementStart = "${pickedDate?.day}-${pickedDate?.month}-${pickedDate?.year}";
+    });
+  }
+
+  Future<void> _selectDateTwo() async {
+    final ThemeData currentTheme = Theme.of(context);
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2022),
+      lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: currentTheme.copyWith(
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: currentTheme.primaryColor,
+              shadowColor: currentTheme.primaryColorDark,
+              headerForegroundColor: currentTheme.highlightColor,
+              subHeaderForegroundColor: currentTheme.highlightColor,
+              dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return currentTheme.highlightColor; // Selected day fill
+                return Colors.transparent;
+              }),
+              dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return currentTheme.primaryColorDark; // Selected day text
+                if (states.contains(WidgetState.disabled)) return currentTheme.primaryColorLight;  // Disabled dates
+                return currentTheme.textTheme.bodySmall?.color;                                         // Standard dates
+              }),
+              weekdayStyle: TextStyle(
+                color: currentTheme.highlightColor
+              )
+            )
+          ),
+          child: child!,
+        );
+      }
+    );
+
+    setState(() {
+      dateTwo = pickedDate;
+      statementEnd = "${pickedDate?.day}-${pickedDate?.month}-${pickedDate?.year}";
+    });
+  }
+
   @override
   void dispose() {
     _notesController.dispose();
     _taskListController.dispose();
     _clientController.dispose();
     _posController.dispose();
-    _dateController.dispose();
     _hoursController.dispose();
     _invoiceNUmberController.dispose();
     super.dispose();
@@ -370,214 +482,289 @@ class _ClientProfileState extends State<ClientProfile> {
                     Column(
                       children: [
                         SizedBox(height: 10,),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColorLight,
-                          ),
-                          padding: EdgeInsets.only(
-                            left: 50,
-                            right: 50,
-                            top: 20
-                          ),
-                          width: screenWidth * 0.45,
-                          height: screenHeight * 0.4,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Client ID: ",
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    currentClient == null ? "" : currentClient!['id'],
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ],
+                        Row(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColorLight,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  bottomLeft: Radius.circular(10)
+                                )
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Contact Person: ",
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    currentClient == null ? "" : currentClient!['client_contact_person'],
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ],
+                              padding: EdgeInsets.only(
+                                left: 50,
+                                right: 50,
+                                top: 20
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              width: screenWidth * 0.25,
+                              height: screenHeight * 0.4,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Text(
-                                    "Contact Number: ",
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    currentClient == null ? "" : currentClient!['client_contact_number'].toString().padLeft(10, '0'),
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Email: ",
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    currentClient == null ? "" : currentClient!['client_email'],
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "VAT Number: ",
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    currentClient == null ? "" : currentClient!['client_vatNumber'].toString(),
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Quoted Price p/h: ",
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    currentClient == null ? "" : currentClient!['client_price_ph'].toString(),
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Payment Term (days): ",
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    currentClient == null ? "" : currentClient!['client_payment_term'].toString(),
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Address: ",
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        currentClient == null ? "" : currentClient!['client_street_address'].toString(),
+                                        "Client ID: ",
                                         style: TextStyle(
                                           color: Theme.of(context).textTheme.bodySmall?.color,
                                           fontSize: 16,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                        textAlign: TextAlign.left,
                                       ),
                                       Text(
-                                        currentClient == null ? "" : currentClient!['client_suburb'].toString(),
+                                        currentClient == null ? "" : currentClient!['id'],
                                         style: TextStyle(
                                           color: Theme.of(context).textTheme.bodySmall?.color,
                                           fontSize: 16,
                                         ),
-                                        textAlign: TextAlign.left,
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Contact Person: ",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       Text(
-                                        currentClient == null ? "" : currentClient!['client_city'].toString(),
+                                        currentClient == null ? "" : currentClient!['client_contact_person'],
                                         style: TextStyle(
                                           color: Theme.of(context).textTheme.bodySmall?.color,
                                           fontSize: 16,
                                         ),
-                                        textAlign: TextAlign.left,
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Contact Number: ",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       Text(
-                                        currentClient == null ? "" : currentClient!['client_postal_code'].toString(),
+                                        currentClient == null ? "" : currentClient!['client_contact_number'].toString().padLeft(10, '0'),
                                         style: TextStyle(
                                           color: Theme.of(context).textTheme.bodySmall?.color,
                                           fontSize: 16,
                                         ),
-                                        textAlign: TextAlign.left,
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Email: ",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        currentClient == null ? "" : currentClient!['client_email'],
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "VAT Number: ",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        currentClient == null ? "" : currentClient!['client_vatNumber'].toString(),
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Quoted Price p/h: ",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        currentClient == null ? "" : currentClient!['client_price_ph'].toString(),
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Payment Term (days): ",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        currentClient == null ? "" : currentClient!['client_payment_term'].toString(),
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Address: ",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            currentClient == null ? "" : currentClient!['client_street_address'].toString(),
+                                            style: TextStyle(
+                                              color: Theme.of(context).textTheme.bodySmall?.color,
+                                              fontSize: 16,
+                                            ),
+                                            textAlign: TextAlign.left,
+                                          ),
+                                          Text(
+                                            currentClient == null ? "" : currentClient!['client_suburb'].toString(),
+                                            style: TextStyle(
+                                              color: Theme.of(context).textTheme.bodySmall?.color,
+                                              fontSize: 16,
+                                            ),
+                                            textAlign: TextAlign.left,
+                                          ),
+                                          Text(
+                                            currentClient == null ? "" : currentClient!['client_city'].toString(),
+                                            style: TextStyle(
+                                              color: Theme.of(context).textTheme.bodySmall?.color,
+                                              fontSize: 16,
+                                            ),
+                                            textAlign: TextAlign.left,
+                                          ),
+                                          Text(
+                                            currentClient == null ? "" : currentClient!['client_postal_code'].toString(),
+                                            style: TextStyle(
+                                              color: Theme.of(context).textTheme.bodySmall?.color,
+                                              fontSize: 16,
+                                            ),
+                                            textAlign: TextAlign.left,
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColorLight,
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(10),
+                                  bottomRight: Radius.circular(10)
+                                )
+                              ),
+                              padding: EdgeInsets.only(
+                                left: 50,
+                                right: 50,
+                                top: 20
+                              ),
+                              width: screenWidth * 0.2,
+                              height: screenHeight * 0.4,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Notes: ",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ],
+                                  ),
+                                  SizedBox(
+                                    height: 300,
+                                    child: TextField(
+                                      controller: _notesController,
+                                      expands: true,
+                                      maxLines: null,
+                                      minLines: null,
+                                      style: TextStyle(
+                                        color: Theme.of(context).textTheme.bodySmall?.color,
+                                      ),
+                                      textAlignVertical: TextAlignVertical.top,
+                                      cursorColor: Theme.of(context).highlightColor,
+                                      decoration: InputDecoration(
+                                        fillColor: Theme.of(context).primaryColorLight,
+                                        filled: true,
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: Theme.of(context).highlightColor,
+                                            width: 1.0,
+                                          )
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: Theme.of(context).highlightColor,
+                                            width: 1.0,
+                                          )
+                                        ),
+                                      ),
+                                      onChanged: (e) {
+                                        updateClientNotes(e);
+                                      },                        
+                                    ),
                                   )
                                 ],
                               ),
-                            ],
-                          ),
+                            )
+                          ],
                         )
                       ],
                     ),
@@ -585,86 +772,15 @@ class _ClientProfileState extends State<ClientProfile> {
                       children: [
                         SizedBox(height: 10,),
                         Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColorLight,
-                          ),
-                          padding: EdgeInsets.only(
-                            left: 50,
-                            right: 50,
-                            top: 20
-                          ),
-                          width: screenWidth * 0.45,
-                          height: screenHeight * 0.4,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Notes: ",
-                                    style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 300,
-                                child: TextField(
-                                  controller: _notesController,
-                                  expands: true,
-                                  maxLines: null,
-                                  minLines: null,
-                                  style: TextStyle(
-                                    color: Theme.of(context).textTheme.bodySmall?.color,
-                                  ),
-                                  textAlignVertical: TextAlignVertical.top,
-                                  cursorColor: Theme.of(context).highlightColor,
-                                  decoration: InputDecoration(
-                                    fillColor: Theme.of(context).primaryColorLight,
-                                    filled: true,
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Theme.of(context).highlightColor,
-                                        width: 1.0,
-                                      )
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Theme.of(context).highlightColor,
-                                        width: 1.0,
-                                      )
-                                    ),
-                                  ),
-                                  onChanged: (e) {
-                                    updateClientNotes(e);
-                                  },                        
-                                ),
-                              )
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
                       width: screenWidth * 0.45,
                       height: screenHeight * 0.4,
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: Theme.of(context).highlightColor,
                           width: 1
-                        )
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        color: Theme.of(context).primaryColor
                       ),
                       child: Column(
                         children: [
@@ -680,7 +796,11 @@ class _ClientProfileState extends State<ClientProfile> {
                                 bottom: BorderSide(
                                   width: 1,
                                   color: Theme.of(context).highlightColor
-                                )
+                                ),
+                              ),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10)
                               ),
                               color: Theme.of(context).primaryColorDark
                             ),
@@ -806,6 +926,16 @@ class _ClientProfileState extends State<ClientProfile> {
                         ],
                       ),
                     ),
+                      ],
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Container(
                       width: screenWidth * 0.45,
                       height: screenHeight * 0.4,
@@ -813,7 +943,9 @@ class _ClientProfileState extends State<ClientProfile> {
                         border: Border.all(
                           color: Theme.of(context).highlightColor,
                           width: 1
-                        )
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        color: Theme.of(context).primaryColor
                       ),
                       child: Column(
                         children: [
@@ -830,6 +962,10 @@ class _ClientProfileState extends State<ClientProfile> {
                                   width: 1,
                                   color: Theme.of(context).highlightColor
                                 )
+                              ),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10)
                               ),
                               color: Theme.of(context).primaryColorDark
                             ),
@@ -927,6 +1063,107 @@ class _ClientProfileState extends State<ClientProfile> {
                               },
                               child: ClientListInvoice(invoiceNum: inv['invoice_number'], id: inv['id'], date: inv['date'], paid: inv['paid'], paidFunc: payInvoice, deleteFunc: activateDeleteInv, mailFunc: mailInvoice,),
                             )
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: screenWidth * 0.45,
+                      height: screenHeight * 0.4,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Theme.of(context).highlightColor,
+                          width: 1
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: 10,
+                              top: 5,
+                              bottom: 5,
+                              right: 10
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  width: 1,
+                                  color: Theme.of(context).highlightColor
+                                )
+                              ),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10)
+                              ),
+                              color: Theme.of(context).primaryColorDark
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    padding: EdgeInsets.only(
+                                      left: 8,
+                                      top: 3,
+                                      bottom: 3
+                                    ),
+                                    child: Text(
+                                      "Statements",
+                                      style: TextStyle(
+                                        color: Theme.of(context).textTheme.bodySmall?.color
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    padding: EdgeInsets.only(
+                                      left: 8,
+                                      top: 3,
+                                      bottom: 3
+                                    ),
+                                    child: Text(
+                                      "Date Generated",
+                                      style: TextStyle(
+                                        color: Theme.of(context).textTheme.bodySmall?.color
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Theme.of(context).primaryColorLight,
+                                        foregroundColor: Theme.of(context).primaryColorDark,
+                                        minimumSize: Size.zero,
+                                        padding: EdgeInsets.only(
+                                          top: 2,
+                                          bottom: 2,
+                                          left: 10,
+                                          right: 10
+                                        )
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          genStatement = true;
+                                        });
+                                      },
+                                      child: Text(
+                                        "Generate Statement",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     )
@@ -1093,7 +1330,6 @@ class _ClientProfileState extends State<ClientProfile> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            deleteInvoiceDataBase(inv);
                             deleteInvoiceItem(inv);                            
                             deleteInv = false;
                           },
@@ -1327,7 +1563,168 @@ class _ClientProfileState extends State<ClientProfile> {
               ),
             ),
           ),
-        )
+        ),
+        Visibility(
+          visible: genStatement,
+          child: Positioned(
+            child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
+                ),
+                padding: EdgeInsets.only(
+                  top: screenHeight * 0.35,
+                  bottom: screenHeight * 0.35,
+                  left: screenWidth * 0.33,
+                  right: screenWidth * 0.33,
+                ),
+                child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8), // Shadow color
+                      spreadRadius: 3, // How much the shadow expands
+                      blurRadius: 5, // Softness of the shadow
+                      offset: Offset(0, 5), // Position changes (x, y)
+                    ),
+                  ],
+                ),
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                         IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              genStatement = false;
+                            });
+                          },
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(
+                            left: 20
+                          ),
+                          child: Text(
+                            "Generate Statement",
+                            style: TextStyle(
+                              color: Theme.of(context).textTheme.bodySmall?.color,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(
+                          width: 250,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _selectDateOne();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColorLight,
+                              foregroundColor: Theme.of(context).highlightColor,
+                              elevation: 5,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 30
+                              )
+                            ),
+                            child: Text(
+                              statementStart,
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                fontSize: 18
+                              ),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          "-",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                            fontSize: 18
+                          ),
+                        ),
+                        SizedBox(
+                          width: 250,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _selectDateTwo();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColorLight,
+                              foregroundColor: Theme.of(context).highlightColor,
+                              elevation: 5,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 30
+                              ),
+                            ),
+                            child: Text(
+                              statementEnd,
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                fontSize: 18
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 30,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColorLight,
+                            foregroundColor: Theme.of(context).highlightColor,
+                            elevation: 5,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 15,
+                              horizontal: 30
+                            )
+                          ),
+                          child: Text(
+                            "Generate",
+                            style: TextStyle(
+                              color: Theme.of(context).textTheme.bodySmall?.color,
+                              fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                              fontSize: 18
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                )
+              ),
+            )
+          ),
+        ),
       ]
     );
   }

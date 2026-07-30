@@ -38,6 +38,7 @@ class AppDatabase {
         number STRING,
         email TEXT,
         recent_invoice INTEGER,
+        recent_statement INTEGER,
         vat_registered TEXT,
         vat_number INTEGER,
         vat_percentage INTEGER,
@@ -119,8 +120,33 @@ class AppDatabase {
         invoice_number INTEGER,
         date TEXT,
         paid TEXT,
+        date_paid TEXT,
         dir TEXT,
         FOREIGN KEY (client_fk) REFERENCES clients(client_bus_name)
+      )
+      '''
+    );
+
+    await db.execute(
+      '''
+      CREATE TABLE client_statements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_fk TEXT,
+        statement_number INTEGER,
+        date TEXT,
+        dir TEXT,
+        FOREIGN KEY (client_fk) REFERENCES clients(client_bus_name)
+      )
+      '''
+    );
+
+    await db.execute(
+      '''
+      CREATE TABLE personal_statements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        statement_number INTEGER,
+        date TEXT,
+        dir TEXT
       )
       '''
     );

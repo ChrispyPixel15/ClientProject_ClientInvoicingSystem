@@ -240,6 +240,27 @@ class _SettingsState extends State<Settings> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
+                        "Last Statement Number:",
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18
+                        ),
+                      ),
+                      Text(
+                        user?["recent_statement"].toString() ?? "",
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontSize: 18
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 20,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
                         "VAT Registered:",
                         style: TextStyle(
                           color: Theme.of(context).textTheme.bodySmall?.color,

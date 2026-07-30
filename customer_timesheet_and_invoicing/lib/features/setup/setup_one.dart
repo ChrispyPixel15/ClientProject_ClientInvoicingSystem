@@ -14,6 +14,7 @@ class SetupOne extends StatefulWidget {
     int? vatNum, 
     int? vatPercentage,
     int? recentInvoice,
+    int? resentStatement,
     String? streetAddress, 
     String? city, 
     String? suburb, 
@@ -43,8 +44,11 @@ class _SetupOneState extends State<SetupOne> {
   final TextEditingController _numberController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _invoiceController = TextEditingController();
+  final TextEditingController _statementController = TextEditingController();
   final TextEditingController _vatNumberController = TextEditingController();
   final TextEditingController _vatPercentageController = TextEditingController();
+
+  bool inputerr = false;
 
   @override
   void dispose() {
@@ -53,14 +57,23 @@ class _SetupOneState extends State<SetupOne> {
     _numberController.dispose();
     _emailController.dispose();
     _invoiceController.dispose();
+    _statementController.dispose();
     _vatNumberController.dispose();
     _vatPercentageController.dispose();
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
+    bool checkInputs() {
+      if (_nameController.text.trim().isEmpty || _busNameController.text.trim().isEmpty || _numberController.text.trim().isEmpty || _emailController.text.trim().isEmpty) {
+        return false;
+      }
+      else {
+        return true;
+      }
+    }
+
     return Center(
       child: Column(
         children: [
@@ -99,6 +112,10 @@ class _SetupOneState extends State<SetupOne> {
             height: 20,
           ),
           CustomTextInput(labelName: "Most Recent Invoice Number *", hintText: "Invoice Number...", password: false, inputController: _invoiceController,),
+          SizedBox(
+            height: 20,
+          ),
+          CustomTextInput(labelName: "Most Recent Statement Number *", hintText: "Statement Number...", password: false, inputController: _statementController,),
           SizedBox(
             height: 20,
           ),
@@ -158,36 +175,56 @@ class _SetupOneState extends State<SetupOne> {
             width: 500,
             child: Container(
               alignment: Alignment.topRight,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColorLight,
-                  foregroundColor: Theme.of(context).primaryColorDark,
-                  elevation: 5,
-                  padding: EdgeInsets.symmetric(
-                    vertical: 15,
-                    horizontal: 30
-                  )
-                ),
-                onPressed: () {
-                  widget.updateUser(
-                    userName: _nameController.text,
-                    busName: _busNameController.text,
-                    number: _numberController.text,
-                    userEmail: _emailController.text,
-                    vatRegistered: widget.vatRegistered.toString(),
-                    vatNum: int.parse(_vatNumberController.text),
-                    vatPercentage: int.parse(_vatPercentageController.text),
-                    recentInvoice: int.parse(_invoiceController.text),
-                  );
-                  widget.onPressed();
-                }, 
-                child: Text(
-                  "Next",
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.bodySmall?.color,
-                    fontSize: 18
+              child: Row(
+                children: [                  
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColorLight,
+                      foregroundColor: Theme.of(context).primaryColorDark,
+                      elevation: 5,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 30
+                      )
+                    ),
+                    onPressed: () {
+                      if (checkInputs() == true) {
+                        widget.updateUser(
+                          userName: _nameController.text.trim().isEmpty ? "" : _nameController.text,
+                          busName: _busNameController.text,
+                          number: _numberController.text,
+                          userEmail: _emailController.text,
+                          vatRegistered: widget.vatRegistered.toString(),
+                          vatNum: _vatNumberController.text.trim().isEmpty ? 0 : int.parse(_vatNumberController.text),
+                          vatPercentage: _vatPercentageController.text.trim().isEmpty ? 0 : int.parse(_vatPercentageController.text),
+                          recentInvoice: _invoiceController.text.trim().isEmpty ? 0 : int.parse( _invoiceController.text),
+                          resentStatement: _statementController.text.trim().isEmpty ? 0 : int.parse(_statementController.text),
+                        );
+                        widget.onPressed();
+                      }
+                      else {
+                        setState(() {
+                          inputerr = true;
+                        });
+                      }
+                    }, 
+                    child: Text(
+                      "Next",
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                        fontSize: 18
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(width: 20,),
+                  Text(
+                    inputerr ? "Please Complete All Relevant Inputs." : "",
+                    style: TextStyle(
+                      color: Theme.of(context).hintColor,
+                      fontSize: 18
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

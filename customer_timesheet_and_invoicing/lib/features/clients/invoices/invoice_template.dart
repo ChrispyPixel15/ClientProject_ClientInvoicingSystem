@@ -18,6 +18,7 @@ class InvoiceTemplate extends BlankPage {
   final String userNumber;
   final String userEmail;
   final String userVatNumber;
+  final String vatAmmount;
   final String userStreet;
   final String userCity;
   final String userSuburb;
@@ -27,6 +28,7 @@ class InvoiceTemplate extends BlankPage {
   final String userAccountName;
   final String userBranchCode;
   final String userBic;
+  final String vatReg;
   final List<Map<String, dynamic>> selectedInvoiceData;
 
   const InvoiceTemplate({
@@ -46,6 +48,7 @@ class InvoiceTemplate extends BlankPage {
     required this.userNumber,
     required this.userEmail,
     required this.userVatNumber,
+    required this.vatAmmount,
     required this.userStreet,
     required this.userCity,
     required this.userSuburb,
@@ -56,12 +59,14 @@ class InvoiceTemplate extends BlankPage {
     required this.userAccountName,
     required this.userBranchCode,
     required this.userBic,
+    required this.vatReg
   });
 
   @override
   Widget createPageContent(BuildContext context) {
     
     final double totalCost = selectedInvoiceData.fold(0, (previous, current) => previous + (current['price_ph']*current['hours']));
+    final double vatTotal = totalCost * (double.parse(vatAmmount) * 1/100);
     final String currentInvoice = invoiceNumber.toString().padLeft(6, '0');
     final DateTime today = DateTime.now();
 
@@ -124,10 +129,11 @@ class InvoiceTemplate extends BlankPage {
                     userEmail,
                     textAlign: TextAlign.left,
                   ),
-                  Text(
-                    userVatNumber,
-                    textAlign: TextAlign.left,
-                  )
+                  if (vatReg == "true")
+                    Text(
+                      userVatNumber,
+                      textAlign: TextAlign.left,
+                    )
                 ],
               ),
               Column(
@@ -164,10 +170,11 @@ class InvoiceTemplate extends BlankPage {
                     clientContactEmail,
                     textAlign: TextAlign.left,
                   ),
-                  Text(
-                    clientVatNumber,
-                    textAlign: TextAlign.left,
-                  )
+                  if (clientVatNumber != "0")
+                    Text(
+                      clientVatNumber,
+                      textAlign: TextAlign.left,
+                    )
                 ],
               ),
               Column(
@@ -287,7 +294,7 @@ class InvoiceTemplate extends BlankPage {
                           top: 10
                         ),
                         child: Text(
-                          item['price_ph'].toString(),
+                          "R ${double.parse(item['price_ph'].toString()).toStringAsFixed(2)}",
                           textAlign: TextAlign.left,
                         ),
                       ),
@@ -307,10 +314,75 @@ class InvoiceTemplate extends BlankPage {
                           top: 10
                         ),
                         child: Text(
-                          (item['price_ph']*item['hours']).toString(),
+                          "R ${double.parse((item['price_ph']*item['hours']).toString()).toStringAsFixed(2)}",
                           textAlign: TextAlign.left,
                         ),
                       ),
+                    ]
+                  ),
+                if (vatReg == "true") 
+                  TableRow(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          color: Theme.of(context).primaryColor,
+                          width: 2
+                        )
+                      ),
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 10,
+                          top: 10
+                        ),
+                        child: Text(
+                          "",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 10,
+                          top: 10
+                        ),
+                        child: Text(
+                          "",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 10,
+                          top: 10
+                        ),
+                        child: Text(
+                          "VAT ($vatAmmount%)",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 10,
+                          top: 10
+                        ),
+                        child: Text(
+                          "R ${vatTotal.toStringAsFixed(2)}",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      )
                     ]
                   ),
                 TableRow(
@@ -368,7 +440,7 @@ class InvoiceTemplate extends BlankPage {
                         top: 10
                       ),
                       child: Text(
-                        totalCost.toString(),
+                        vatReg == "true" ? "R ${(totalCost + vatTotal).toStringAsFixed(2)}" : "R ${(totalCost).toStringAsFixed(2)}",
                         textAlign: TextAlign.left,
                         style: TextStyle(
                           fontWeight: FontWeight.bold

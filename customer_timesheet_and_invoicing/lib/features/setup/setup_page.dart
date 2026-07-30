@@ -32,6 +32,7 @@ class _SetupPageState extends State<SetupPage> {
     int? vatNum, 
     int? vatPercentage,
     int? recentInvoice,
+    int? resentStatement,
     String? streetAddress, 
     String? city, 
     String? suburb, 
@@ -53,6 +54,7 @@ class _SetupPageState extends State<SetupPage> {
       if (vatNum != null) _draft.vatNumber = vatNum;
       if (vatPercentage != null) _draft.vatPercentage = vatPercentage;
       if (recentInvoice != null) _draft.recentInvoice = recentInvoice;
+      if (resentStatement != null) _draft.resentStatement = resentStatement;
       if (streetAddress != null) _draft.streetAddress = streetAddress;
       if (city != null) _draft.city = city;
       if (suburb != null) _draft.suburb = suburb;
@@ -87,6 +89,7 @@ class _SetupPageState extends State<SetupPage> {
       'vat_number': _draft.vatNumber,
       'vat_percentage': _draft.vatPercentage,
       'recent_invoice': _draft.recentInvoice,
+      'recent_statement': _draft.resentStatement,
       'street_address': _draft.streetAddress,
       'city': _draft.city,
       'suburb': _draft.suburb,
@@ -154,7 +157,7 @@ class _SetupPageState extends State<SetupPage> {
         title: Center(
           child: Text("Setup")
         ),
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).primaryColorDark,
         titleTextStyle: TextStyle(
           color: Theme.of(context).textTheme.titleLarge?.color,
           fontSize: 30,
@@ -195,9 +198,9 @@ class _SetupPageState extends State<SetupPage> {
           ],
         ),
       ),
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Theme.of(context).primaryColorDark,
       bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).primaryColor,
+        color: Theme.of(context).primaryColorDark,
         height: 48,
         child: Text(
           "\u00a9 ${DateTime.now().year} Chris Designed. All Rights Reserved.",
@@ -221,6 +224,7 @@ class UserDraft {
   int? vatNumber;
   int? vatPercentage;
   int? recentInvoice;
+  int? resentStatement;
   String? streetAddress;
   String? city;
   String? suburb;

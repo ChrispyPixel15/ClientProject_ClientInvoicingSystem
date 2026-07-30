@@ -20,6 +20,7 @@ class _EditSettingsState extends State<EditSettings> {
   final TextEditingController _numberController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _recentInvoice = TextEditingController();
+  final TextEditingController _statementController = TextEditingController();
   final TextEditingController _vatNumberController = TextEditingController();
   final TextEditingController _vatPercentageController = TextEditingController();
   final TextEditingController _streetAddressController = TextEditingController();
@@ -46,6 +47,7 @@ class _EditSettingsState extends State<EditSettings> {
       _numberController.text = result['number'].toString();
       _emailController.text = result['email'] ?? result['email'];
       _recentInvoice.text = result['recent_invoice'].toString();
+      _statementController.text = result['recent_statement'].toString();
       _vatNumberController.text = result['vat_number'].toString();
       _vatPercentageController.text = result['vat_percentage'].toString();
       _streetAddressController.text = result['street_address'] ?? result['street_address'];
@@ -67,6 +69,7 @@ class _EditSettingsState extends State<EditSettings> {
       'number': _numberController.text,
       'email': _emailController.text,
       'recent_invoice': int.parse(_recentInvoice.text),
+      'recent_statement': int.parse(_statementController.text),
       'vat_registered': vatReg == true ? "true" : "false",
       'vat_number': int.parse(_vatNumberController.text),
       'vat_percentage': int.parse(_vatPercentageController.text),
@@ -98,6 +101,7 @@ class _EditSettingsState extends State<EditSettings> {
     _bicController.dispose();
     _accountNumberController.dispose();
     _recentInvoice.dispose();
+    _statementController.dispose();
     super.dispose();
   }
 
@@ -129,6 +133,7 @@ class _EditSettingsState extends State<EditSettings> {
                     ],
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -145,6 +150,7 @@ class _EditSettingsState extends State<EditSettings> {
                     ],
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -161,6 +167,7 @@ class _EditSettingsState extends State<EditSettings> {
                      ],
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -177,6 +184,7 @@ class _EditSettingsState extends State<EditSettings> {
                     ],
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -193,6 +201,7 @@ class _EditSettingsState extends State<EditSettings> {
                     ],
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -208,8 +217,26 @@ class _EditSettingsState extends State<EditSettings> {
                       )
                     ],
                   ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Last Statement Number:",
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18
+                        ),
+                      ),
+                      CustomTextInput(
+                        labelName: "", hintText: "Statement Number...", password: false, inputController: _statementController
+                      )
+                    ],
+                  ),
                   SizedBox(height: 20,),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -250,6 +277,7 @@ class _EditSettingsState extends State<EditSettings> {
                     ],
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -266,6 +294,7 @@ class _EditSettingsState extends State<EditSettings> {
                     ],
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -278,83 +307,6 @@ class _EditSettingsState extends State<EditSettings> {
                       ),
                       CustomTextInput(
                         labelName: "", hintText: "VAT Percentage...", password: false, inputController: _vatPercentageController
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Address",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Street Address:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      CustomTextInput(
-                        labelName: "", hintText: "Stree Address...", password: false, inputController: _streetAddressController
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "City:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      CustomTextInput(
-                        labelName: "", hintText: "City...", password: false, inputController: _cityController
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Suburb:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      CustomTextInput(
-                        labelName: "", hintText: "Suburb...", password: false, inputController: _suburbController
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Postal Code:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      CustomTextInput(
-                        labelName: "", hintText: "Postal Code...", password: false, inputController: _postalCodeController
                       )
                     ],
                   ),
@@ -376,6 +328,87 @@ class _EditSettingsState extends State<EditSettings> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
+                        "Address",
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Street Address:",
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18
+                        ),
+                      ),
+                      CustomTextInput(
+                        labelName: "", hintText: "Stree Address...", password: false, inputController: _streetAddressController
+                      )
+                    ],
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "City:",
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18
+                        ),
+                      ),
+                      CustomTextInput(
+                        labelName: "", hintText: "City...", password: false, inputController: _cityController
+                      )
+                    ],
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Suburb:",
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18
+                        ),
+                      ),
+                      CustomTextInput(
+                        labelName: "", hintText: "Suburb...", password: false, inputController: _suburbController
+                      )
+                    ],
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Postal Code:",
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18
+                        ),
+                      ),
+                      CustomTextInput(
+                        labelName: "", hintText: "Postal Code...", password: false, inputController: _postalCodeController
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
                         "Bank Account",
                         style: TextStyle(
                           color: Theme.of(context).textTheme.bodySmall?.color,
@@ -386,6 +419,7 @@ class _EditSettingsState extends State<EditSettings> {
                     ],
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -402,6 +436,7 @@ class _EditSettingsState extends State<EditSettings> {
                     ],
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -418,6 +453,7 @@ class _EditSettingsState extends State<EditSettings> {
                     ],
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -434,6 +470,7 @@ class _EditSettingsState extends State<EditSettings> {
                     ],
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -451,6 +488,7 @@ class _EditSettingsState extends State<EditSettings> {
                   ),
                   SizedBox(height: 20,),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       ElevatedButton(

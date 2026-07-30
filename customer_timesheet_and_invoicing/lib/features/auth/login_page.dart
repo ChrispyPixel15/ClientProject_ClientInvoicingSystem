@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Theme.of(context).primaryColorDark,
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -102,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).primaryColor,
+        color: Theme.of(context).primaryColorDark,
         height: 48,
         child: Text(
           "\u00a9 ${DateTime.now().year} Chris Designed. All Rights Reserved.",

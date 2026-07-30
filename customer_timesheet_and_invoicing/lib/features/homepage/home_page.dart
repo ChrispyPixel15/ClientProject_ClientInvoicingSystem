@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
           padding: const EdgeInsets.all(8.0),
           child: Text(pageTitle),
         ),
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).primaryColorDark,
         titleTextStyle: TextStyle(
           color: Theme.of(context).textTheme.titleLarge?.color,
           fontSize: 30,
@@ -101,7 +101,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: page,
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Theme.of(context).primaryColorDark,
     );
   }
 }

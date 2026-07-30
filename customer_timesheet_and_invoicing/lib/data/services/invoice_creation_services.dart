@@ -43,7 +43,7 @@ class InvoiceCreationServices {
     await db.execute(
       '''
       CREATE TABLE invoice$invoiceNum (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER,
         client_fk TEXT,
         pos_fk TEXT,
         task_name TEXT,
