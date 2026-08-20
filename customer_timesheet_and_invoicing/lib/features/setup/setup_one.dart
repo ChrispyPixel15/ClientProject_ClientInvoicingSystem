@@ -190,7 +190,7 @@ class _SetupOneState extends State<SetupOne> {
                     onPressed: () {
                       if (checkInputs() == true) {
                         widget.updateUser(
-                          userName: _nameController.text.trim().isEmpty ? "" : _nameController.text,
+                          userName: _nameController.text,
                           busName: _busNameController.text,
                           number: _numberController.text,
                           userEmail: _emailController.text,

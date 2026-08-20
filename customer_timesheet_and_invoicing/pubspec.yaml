@@ -43,6 +43,8 @@ dependencies:
   open_file: ^3.5.11
   path_provider: ^2.1.5
   url_launcher: ^6.3.2
+  shared_preferences: ^2.5.5
+  file_picker: ^8.0.0
 
 dev_dependencies:
   flutter_test:
@@ -62,7 +64,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  assets: 
+      - lib/assets/default.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

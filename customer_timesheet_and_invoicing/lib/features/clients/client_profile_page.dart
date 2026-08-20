@@ -8,12 +8,15 @@ import 'package:customer_timesheet_and_invoicing/data/services/statement_creatio
 import 'package:customer_timesheet_and_invoicing/data/services/timesheet_task_creation_services.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/user_creation_service.dart';
 import 'package:customer_timesheet_and_invoicing/features/clients/components/client_list_invoice.dart';
+import 'package:customer_timesheet_and_invoicing/features/clients/components/client_list_statement.dart';
 import 'package:customer_timesheet_and_invoicing/features/clients/components/client_task_list_items.dart';
 import 'package:customer_timesheet_and_invoicing/features/clients/components/invoice_generator_client_task.dart';
 import 'package:customer_timesheet_and_invoicing/features/clients/invoices/invoice_template.dart';
+import 'package:customer_timesheet_and_invoicing/features/clients/statements/client_statement_template.dart';
 import 'package:customer_timesheet_and_invoicing/features/settings/settings_page.dart';
 import 'package:customer_timesheet_and_invoicing/features/timesheet/components/timesheet_task_item.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf_maker/pdf_maker.dart';
@@ -38,12 +41,14 @@ class _ClientProfileState extends State<ClientProfile> {
   bool editClient = false;
   bool deleteBool = false;
   bool deleteInv = false;
+  bool deleteState = false;
   bool editTask = false;
   bool genInv = false;
   bool genStatement = false;
 
   int taskID = 0;
   int inv = 0;
+  int state = 0;
 
   String statementStart = "Start Date";
   String statementEnd = "End Date";
@@ -51,12 +56,15 @@ class _ClientProfileState extends State<ClientProfile> {
   DateTime? dateOne;
   DateTime? dateTwo;
 
+  DateTime? today = DateTime.now();
+
   Map<String, dynamic>? currentClient;
   List<Map<String, dynamic>> currentClientTaskList = [];
   List<Map<String, dynamic>> currentClientInvoices = [];
   List<Map<String, dynamic>> selectedInvoiceData = [];
   List<Map<String, dynamic>> uninvoicedTasks = [];
   List<Map<String, dynamic>> currentClientStatementList = [];
+  List<Map<String, dynamic>> invoicesInTerm = [];
 
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _taskListController = TextEditingController();
@@ -71,7 +79,48 @@ class _ClientProfileState extends State<ClientProfile> {
     loadClient();
     getClientTaskList();
     getClientInvoices();
+    getClientStatements();
     getUserData();
+  }
+
+  Future<void> _selectDate() async {
+    final ThemeData currentTheme = Theme.of(context);
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: today,
+      firstDate: DateTime(2022),
+      lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: currentTheme.copyWith(
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: currentTheme.primaryColor,
+              shadowColor: currentTheme.primaryColorDark,
+              headerForegroundColor: currentTheme.highlightColor,
+              subHeaderForegroundColor: currentTheme.highlightColor,
+              dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return currentTheme.highlightColor; // Selected day fill
+                return Colors.transparent;
+              }),
+              dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return currentTheme.primaryColorDark; // Selected day text
+                if (states.contains(WidgetState.disabled)) return currentTheme.primaryColorLight;  // Disabled dates
+                return currentTheme.textTheme.bodySmall?.color;                                         // Standard dates
+              }),
+              weekdayStyle: TextStyle(
+                color: currentTheme.highlightColor
+              )
+            )
+          ),
+          child: child!,
+        );
+      }
+    );
+
+    setState(() {
+      today = pickedDate;
+    });
   }
 
   Future<void> getUserData() async {
@@ -81,6 +130,8 @@ class _ClientProfileState extends State<ClientProfile> {
       debugPrint(user.toString());
       int tempinv = result!["recent_invoice"];
       inv = tempinv;
+      int tempstate = result["recent_statement"];
+      state = tempstate;
       debugPrint(result.toString());
     });
   }
@@ -173,11 +224,18 @@ class _ClientProfileState extends State<ClientProfile> {
   }
 
   Future<void> generateInvoice(String directory) async {
+    double amount = 0;
+
+    for (var item in selectedInvoiceData) {
+      amount = amount + (item['price_ph']*item['hours']);
+    }
+
     await invoiceServices.createInvoice({
       'client_fk': currentClient!["client_bus_name"],
       'invoice_number': inv,
-      'date': '${DateTime.now().day}-${DateTime.now().month}-${DateTime.now().year}',
+      'date': "${today?.day}-${today?.month}-${today?.year}",
       'paid': 'false',
+      'total_amount': amount.toString(),
       'dir': directory
     });
     await userCreationServices.updateUser({
@@ -239,11 +297,13 @@ class _ClientProfileState extends State<ClientProfile> {
   }
 
   Future<void> payInvoice(int id, bool paid) async {
+    DateTime now = DateTime.now();
+
     if (paid == true) {
       removeUnpaidAmountInvoices();
       await invoiceServices.updateInvoice(id, {
         'paid': paid.toString(),
-        'date_paid': DateTime.now().toString().split(' ')[0],
+        'date_paid': '${now.day}-${now.month}-${now.year}',
       });
     }
     else {
@@ -325,6 +385,8 @@ class _ClientProfileState extends State<ClientProfile> {
           userBranchCode: user!['branch_code'].toString(),
           userBic: user!['bic'].toString(),
           vatReg: user!['vat_registered'],
+          logo: user!['logo_dir'], 
+          invoiceDate: today,
         ),
         setup: PageSetup(
           context: context,
@@ -432,6 +494,140 @@ class _ClientProfileState extends State<ClientProfile> {
     });
   }
 
+  Future<void> getTermInvoices() async {
+    DateFormat dateFormat = DateFormat("dd-MM-yyyy");    
+
+    List<Map<String, dynamic>> invoices = List<Map<String, dynamic>>.from(currentClientInvoices.where((invoice) {
+      return (dateFormat.parse(invoice["date"]).isAfter(dateOne ?? DateTime.now()) || dateFormat.parse(invoice["date"]).isAtSameMomentAs(dateOne ?? DateTime.now())) &&
+      (dateFormat.parse(invoice["date"]).isBefore(dateTwo ?? DateTime.now()) || dateFormat.parse(invoice["date"]).isAtSameMomentAs(dateTwo ?? DateTime.now()));
+    }));
+
+    for (var invoice in List.from(invoices))  {
+      if (invoice["paid"] == "true") {
+        invoices.add({
+          'invoice_number': invoice['invoice_number'],
+          'item': "paid",
+          'date': invoice["date_paid"],
+          'total_amount': invoice['total_amount'],
+        });
+      }
+    }
+
+    invoices.sort((a, b) => dateFormat.parse(a["date"]).compareTo(dateFormat.parse(b["date"])));
+
+    invoicesInTerm = invoices;
+  }
+
+  Future<void> generateStatement(String directory) async {
+
+    await clientStatementServices.createClientStatement({
+      'client_fk': currentClient!["client_bus_name"],
+      'statement_number': state,
+      'date': '${DateTime.now().day}-${DateTime.now().month}-${DateTime.now().year}',
+      'dir': directory
+    });
+    await userCreationServices.updateUser({
+      'recent_statement': user!['recent_statement'] + 1,
+    });
+    await getUserData();
+    getClientStatements();
+  }
+
+  Future<void> createStatementPDF() async {
+
+      PDFMaker maker = PDFMaker();
+
+      maker.createPDF(
+        StatementTemplate(
+          statementNumber: state,
+          clientContactPerson: currentClient!['client_contact_person'],
+          clientContactNumber: currentClient!['client_contact_number'].toString(),
+          clientContactEmail: currentClient!['client_email'],
+          clientVatNumber: currentClient!['client_vatNumber'].toString(),
+          quotedPrice: currentClient!['client_price_ph'],
+          clientStreet: currentClient!['client_street_address'],
+          clientCity: currentClient!['client_city'],
+          clientSuburb: currentClient!['client_suburb'],
+          clientPostal: currentClient!['client_postal_code'].toString(),
+          userName: user!['name'],
+          userNumber: user!['number'].toString(),
+          vatAmmount: user!['vat_percentage'].toString(),
+          userEmail: user!['email'],
+          userVatNumber: user!['vat_number'].toString(),
+          userStreet: user!['street_address'],
+          userCity: user!['city'],
+          userSuburb: user!['suburb'],
+          userPostal: user!['postal_code'].toString(),
+          userAccountnum: user!['account_number'].toString(),
+          userBankName: user!['bank'],
+          userAccountName: user!['account_number'].toString(),
+          userBranchCode: user!['branch_code'].toString(),
+          userBic: user!['bic'].toString(),
+          vatReg: user!['vat_registered'],
+          invoiceDataBetweenDates: invoicesInTerm,
+          logo: user!['logo_dir']
+        ),
+        setup: PageSetup(
+          context: context,
+          quality: 4.0,
+          scale: 1.0,
+          pageFormat: PageFormat.a4,
+          margins: 40
+        )
+      ).then((file) {
+        saveAndOpenStatement(file, 'Statement $state');
+      });
+    }
+
+    Future<void> saveAndOpenStatement(Uint8List file, String fileName) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final customDir = Directory('${dir.path}/SavedStatements');
+    if (!await customDir.exists()) {
+      await customDir.create(recursive: true);
+    }
+    final savedFile = File('${customDir.path}/$fileName.pdf');
+    await savedFile.writeAsBytes(file);
+    generateStatement('${customDir.path}/$fileName.pdf');
+    await OpenFile.open('${customDir.path}/$fileName.pdf');
+  }
+
+  Future<void> openStatement(int statementNum) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final customDir = Directory('${dir.path}/SavedStatements');
+    await OpenFile.open('${customDir.path}/Statement $statementNum.pdf');
+  }
+
+  Future<void> deleteSattementItem(int statementNum) async {
+    deleteStatement(statementNum);
+    await clientStatementServices.deleteClientStatement(statementNum);
+    await userCreationServices.updateUser({
+      'recent_statement': user!['recent_statement'] - 1,
+    });
+    await getUserData();
+    getClientStatements();
+  }
+
+  Future<void> deleteStatement(int statementNum) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final customDir = Directory('${dir.path}/SavedStatements');
+    final file = File('${customDir.path}/Statement $statementNum.pdf');
+    if (await file.exists()) {
+      file.delete();
+    }
+  }
+
+   Future<void> mailStatement(int statementNum) async {
+     final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: currentClient!['client_email'],
+      queryParameters: {
+        'subject': 'Statement $statementNum',
+        'body': user!["default_email"]
+      }
+    );
+    await launchUrl(emailLaunchUri);
+  }
+
   @override
   void dispose() {
     _notesController.dispose();
@@ -459,6 +655,13 @@ class _ClientProfileState extends State<ClientProfile> {
       setState(() {
         deleteInv = delete;
         inv = id;
+      });
+    }
+
+    void activateDeleteState(int id, bool delete) {
+      setState(() {
+        deleteState = delete;
+        state = id;
       });
     }
 
@@ -768,148 +971,154 @@ class _ClientProfileState extends State<ClientProfile> {
                         )
                       ],
                     ),
-                    Column(
-                      children: [
-                        SizedBox(height: 10,),
-                        Container(
-                      width: screenWidth * 0.45,
-                      height: screenHeight * 0.4,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Theme.of(context).highlightColor,
-                          width: 1
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        color: Theme.of(context).primaryColor
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10)
                       ),
                       child: Column(
                         children: [
+                          SizedBox(height: 10,),
                           Container(
-                            padding: EdgeInsets.only(
-                              left: 10,
-                              top: 5,
-                              bottom: 5,
-                              right: 10
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  color: Theme.of(context).highlightColor
-                                ),
-                              ),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10)
-                              ),
-                              color: Theme.of(context).primaryColorDark
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 8,
-                                      top: 3,
-                                      bottom: 3
-                                    ),
-                                    child: Text(
-                                      "Task",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 8,
-                                      top: 3,
-                                      bottom: 3
-                                    ),
-                                    child: Text(
-                                      "Purchase Order Number",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 8,
-                                      top: 3,
-                                      bottom: 3
-                                    ),
-                                    child: Text(
-                                      "Date",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 8,
-                                      top: 3,
-                                      bottom: 3
-                                    ),
-                                    child: Text(
-                                      "Hours",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 8,
-                                      top: 3,
-                                      bottom: 3
-                                    ),
-                                    child: Text(
-                                      "Invoiced",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 8,
-                                      top: 3,
-                                      bottom: 3
-                                    ),
-                                    child: Text(
-                                      "",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
+                        width: screenWidth * 0.45,
+                        height: screenHeight * 0.4,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(context).highlightColor,
+                            width: 1
                           ),
-                          SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                for (var task in currentClientTaskList)
-                                  ClientTimeTaskListItem(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          color: Theme.of(context).primaryColor
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(
+                                left: 10,
+                                top: 5,
+                                bottom: 5,
+                                right: 10
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Theme.of(context).highlightColor
+                                  ),
+                                ),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10)
+                                ),
+                                color: Theme.of(context).primaryColorDark
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 8,
+                                        top: 3,
+                                        bottom: 3
+                                      ),
+                                      child: Text(
+                                        "Task",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 8,
+                                        top: 3,
+                                        bottom: 3
+                                      ),
+                                      child: Text(
+                                        "Purchase Order Number",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 8,
+                                        top: 3,
+                                        bottom: 3
+                                      ),
+                                      child: Text(
+                                        "Date",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 8,
+                                        top: 3,
+                                        bottom: 3
+                                      ),
+                                      child: Text(
+                                        "Units",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 8,
+                                        top: 3,
+                                        bottom: 3
+                                      ),
+                                      child: Text(
+                                        "Invoiced",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 8,
+                                        top: 3,
+                                        bottom: 3
+                                      ),
+                                      child: Text(
+                                        "",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: currentClientTaskList.length,
+                                itemBuilder: (context, index) {
+                                  final task = currentClientTaskList[index];
+                                  return ClientTimeTaskListItem(
                                     id: task['id'], 
                                     task: task['task_fk'], 
                                     pos: task['pos_fk'], 
@@ -919,14 +1128,15 @@ class _ClientProfileState extends State<ClientProfile> {
                                     invoiced: task['invoiced'], 
                                     rowColor: Theme.of(context).primaryColor, 
                                     deleteFunc: activateDelete,
-                                  )
-                              ],
-                            ),
-                          )
+                                  );
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                         ],
                       ),
-                    ),
-                      ],
                     ),
                   ],
                 ),
@@ -936,235 +1146,269 @@ class _ClientProfileState extends State<ClientProfile> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      width: screenWidth * 0.45,
-                      height: screenHeight * 0.4,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Theme.of(context).highlightColor,
-                          width: 1
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        color: Theme.of(context).primaryColor
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10)
                       ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(
-                              left: 10,
-                              top: 5,
-                              bottom: 5,
-                              right: 10
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  color: Theme.of(context).highlightColor
-                                )
+                      child: Container(
+                        width: screenWidth * 0.45,
+                        height: screenHeight * 0.4,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(context).highlightColor,
+                            width: 1
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          color: Theme.of(context).primaryColor
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(
+                                left: 10,
+                                top: 5,
+                                bottom: 5,
+                                right: 10
                               ),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10)
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Theme.of(context).highlightColor
+                                  )
+                                ),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10)
+                                ),
+                                color: Theme.of(context).primaryColorDark
                               ),
-                              color: Theme.of(context).primaryColorDark
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 8,
-                                      top: 3,
-                                      bottom: 3
-                                    ),
-                                    child: Text(
-                                      "Invoices",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 8,
+                                        top: 3,
+                                        bottom: 3
                                       ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 8,
-                                      top: 3,
-                                      bottom: 3
-                                    ),
-                                    child: Text(
-                                      "Date Generated",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 8,
-                                      right: 80,
-                                      top: 3,
-                                      bottom: 3
-                                    ),
-                                    child: Text(
-                                      "Paid",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color,
-                                      ),
-                                      textAlign: TextAlign.end,
-                                    ),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Theme.of(context).primaryColorLight,
-                                        foregroundColor: Theme.of(context).primaryColorDark,
-                                        minimumSize: Size.zero,
-                                        padding: EdgeInsets.only(
-                                          top: 2,
-                                          bottom: 2,
-                                          left: 10,
-                                          right: 10
-                                        )
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          genInv = true;
-                                          _invoiceNUmberController.text = (user!["recent_invoice"] + 1).toString();
-                                        });
-                                        inv = user!["recent_invoice"] + 1;
-                                        generateInvoiceDB(user!["recent_invoice"] + 1);
-                                        getUninvoicedTasks();
-                                      },
                                       child: Text(
-                                        "Generate Invoice",
+                                        "Invoices",
                                         style: TextStyle(
                                           color: Theme.of(context).textTheme.bodySmall?.color
                                         ),
                                       ),
                                     ),
-                                  ],
-                                )
-                              ],
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 8,
+                                        top: 3,
+                                        bottom: 3
+                                      ),
+                                      child: Text(
+                                        "Date Generated",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 8,
+                                        right: 80,
+                                        top: 3,
+                                        bottom: 3
+                                      ),
+                                      child: Text(
+                                        "Paid",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                        ),
+                                        textAlign: TextAlign.end,
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Theme.of(context).primaryColorLight,
+                                          foregroundColor: Theme.of(context).primaryColorDark,
+                                          minimumSize: Size.zero,
+                                          padding: EdgeInsets.only(
+                                            top: 2,
+                                            bottom: 2,
+                                            left: 10,
+                                            right: 10
+                                          )
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            genInv = true;
+                                            _invoiceNUmberController.text = (user!["recent_invoice"] + 1).toString();
+                                          });
+                                          inv = user!["recent_invoice"] + 1;
+                                          generateInvoiceDB(user!["recent_invoice"] + 1);
+                                          getUninvoicedTasks();
+                                        },
+                                        child: Text(
+                                          "Generate Invoice",
+                                          style: TextStyle(
+                                            color: Theme.of(context).textTheme.bodySmall?.color
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                          for(var inv in currentClientInvoices) 
-                            InkWell(
-                              onTap: () {
-                                openFile(inv['invoice_number']);
-                              },
-                              child: ClientListInvoice(invoiceNum: inv['invoice_number'], id: inv['id'], date: inv['date'], paid: inv['paid'], paidFunc: payInvoice, deleteFunc: activateDeleteInv, mailFunc: mailInvoice,),
-                            )
-                        ],
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: currentClientInvoices.length,
+                                itemBuilder: (context, index) {
+                                  final inv = currentClientInvoices[index];
+                                  return InkWell(
+                                    onTap: () {
+                                      openFile(inv['invoice_number']);
+                                    },
+                                    child: ClientListInvoice(invoiceNum: inv['invoice_number'], id: inv['id'], date: inv['date'], paid: inv['paid'], paidFunc: payInvoice, deleteFunc: activateDeleteInv, mailFunc: mailInvoice,),
+                                  );
+                                },
+                              ),
+                            )                           
+                          ],
+                        ),
                       ),
                     ),
-                    Container(
-                      width: screenWidth * 0.45,
-                      height: screenHeight * 0.4,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Theme.of(context).highlightColor,
-                          width: 1
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        color: Theme.of(context).primaryColor,
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10)
                       ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(
-                              left: 10,
-                              top: 5,
-                              bottom: 5,
-                              right: 10
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  color: Theme.of(context).highlightColor
-                                )
+                      child: Container(
+                        width: screenWidth * 0.45,
+                        height: screenHeight * 0.4,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(context).highlightColor,
+                            width: 1
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(
+                                left: 10,
+                                top: 5,
+                                bottom: 5,
+                                right: 10
                               ),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10)
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Theme.of(context).highlightColor
+                                  )
+                                ),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10)
+                                ),
+                                color: Theme.of(context).primaryColorDark
                               ),
-                              color: Theme.of(context).primaryColorDark
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 8,
-                                      top: 3,
-                                      bottom: 3
-                                    ),
-                                    child: Text(
-                                      "Statements",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 8,
+                                        top: 3,
+                                        bottom: 3
                                       ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 8,
-                                      top: 3,
-                                      bottom: 3
-                                    ),
-                                    child: Text(
-                                      "Date Generated",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Theme.of(context).primaryColorLight,
-                                        foregroundColor: Theme.of(context).primaryColorDark,
-                                        minimumSize: Size.zero,
-                                        padding: EdgeInsets.only(
-                                          top: 2,
-                                          bottom: 2,
-                                          left: 10,
-                                          right: 10
-                                        )
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          genStatement = true;
-                                        });
-                                      },
                                       child: Text(
-                                        "Generate Statement",
+                                        "Statements",
                                         style: TextStyle(
                                           color: Theme.of(context).textTheme.bodySmall?.color
                                         ),
                                       ),
                                     ),
-                                  ],
-                                )
-                              ],
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 8,
+                                        top: 3,
+                                        bottom: 3
+                                      ),
+                                      child: Text(
+                                        "Date Generated",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Theme.of(context).primaryColorLight,
+                                          foregroundColor: Theme.of(context).primaryColorDark,
+                                          minimumSize: Size.zero,
+                                          padding: EdgeInsets.only(
+                                            top: 2,
+                                            bottom: 2,
+                                            left: 10,
+                                            right: 10
+                                          )
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            genStatement = true;
+                                            state = user!["recent_statement"] + 1;
+                                          });
+                                        },
+                                        child: Text(
+                                          "Generate Statement",
+                                          style: TextStyle(
+                                            color: Theme.of(context).textTheme.bodySmall?.color
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: currentClientStatementList.length,
+                                itemBuilder: (context, index) {
+                                  final state = currentClientStatementList[index];
+                                  return InkWell(
+                                    onTap: () {
+                                      openStatement(state['statement_number']);
+                                    },
+                                    child: ClientListStatement(statementNum: state['statement_number'], id: state['id'], date: state['date'], deleteFunc: activateDeleteState, mailFunc: mailStatement,),
+                                  );
+                                },
+                              ),
+                            ) 
+                          ],
+                        ),
                       ),
                     )
                   ],
@@ -1391,8 +1635,8 @@ class _ClientProfileState extends State<ClientProfile> {
                 color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
               ),
               padding: EdgeInsets.only(
-                top: screenHeight * 0.18,
-                bottom: screenHeight * 0.18,
+                top: screenHeight * 0.15,
+                bottom: screenHeight * 0.15,
                 left: screenWidth * 0.35,
                 right: screenWidth * 0.35,
               ),
@@ -1402,10 +1646,10 @@ class _ClientProfileState extends State<ClientProfile> {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
+                      color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8),
                       spreadRadius: 3,
                       blurRadius: 5,
-                      offset: Offset(0, 5),
+                      offset: Offset(0, 5) 
                     )
                   ]
                 ),
@@ -1474,6 +1718,32 @@ class _ClientProfileState extends State<ClientProfile> {
                     SizedBox(
                       height: 20,
                     ),
+                    SizedBox(
+                      width: 520,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _selectDate();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColorLight,
+                          foregroundColor: Theme.of(context).highlightColor,
+                          elevation: 5,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 15,
+                            horizontal: 30
+                          )
+                        ),
+                        child: Text(
+                          today.toString().split(' ')[0],
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                            fontSize: 18
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20,),
                     Container(
                       padding: EdgeInsets.only(
                         left: 20,
@@ -1495,34 +1765,35 @@ class _ClientProfileState extends State<ClientProfile> {
                               ),
                             ],
                           ),
-                          SingleChildScrollView(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Theme.of(context).highlightColor,
-                                  width: 1
-                                )
-                              ),
-                              height: screenHeight * 0.3,
-                              width: 1000,
-                              child: Column(
-                                children: [
-                                  for (var task in uninvoicedTasks)
-                                    ClientInvoiceTask(
-                                      id: task['id'], 
-                                      task: task['task_fk'], 
-                                      pos: task['pos_fk'], 
-                                      date: task['date'], 
-                                      hours: task['hours'], 
-                                      client: currentClient!["client_bus_name"], 
-                                      priceph: currentClient!["client_price_ph"],
-                                      addTaskToInv: addTasktoInvoice,
-                                      deleteTaskFromInv: deleteTaskFromInvoice,
-                                      updateInvoiced: updateTimeTaskInvoiced,
-                                    )
-                                ],
-                              ),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Theme.of(context).highlightColor,
+                                width: 1
+                              )
                             ),
+                            height: screenHeight * 0.3,
+                            width: 1000,
+                            child: Expanded(
+                              child: ListView.builder(
+                                itemCount: uninvoicedTasks.length,
+                                itemBuilder: (context, index) {
+                                  final task = uninvoicedTasks[index];
+                                  return ClientInvoiceTask(
+                                    id: task['id'], 
+                                    task: task['task_fk'], 
+                                    pos: task['pos_fk'], 
+                                    date: task['date'], 
+                                    hours: task['hours'], 
+                                    client: currentClient!["client_bus_name"], 
+                                    priceph: currentClient!["client_price_ph"],
+                                    addTaskToInv: addTasktoInvoice,
+                                    deleteTaskFromInv: deleteTaskFromInvoice,
+                                    updateInvoiced: updateTimeTaskInvoiced,
+                                  );
+                                },
+                              ),
+                            )
                           ),                          
                         ],
                       ),
@@ -1565,6 +1836,113 @@ class _ClientProfileState extends State<ClientProfile> {
           ),
         ),
         Visibility(
+          visible: deleteState,
+          child: Positioned(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
+              ),
+              padding: EdgeInsets.only(
+                top: screenHeight * 0.35,
+                bottom: screenHeight * 0.35,
+                left: screenWidth * 0.33,
+                right: screenWidth * 0.33,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  border: Border.all(
+                    color: const Color.fromARGB(255, 216, 19, 5),
+                    width: 2
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8),
+                      spreadRadius: 3,
+                      blurRadius: 5,
+                      offset: Offset(0, 5) 
+                    )
+                  ]
+                ),
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(
+                        top: 50
+                      ),
+                      child: Text(
+                        "Are you sure you want to delete this Statement?",
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontSize: 30,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(height: 35,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            deleteSattementItem(state); 
+                            setState(() {
+                              deleteState = false;
+                            });                          
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color.fromARGB(255, 218, 29, 15),
+                            foregroundColor: Theme.of(context).primaryColorDark,
+                            elevation: 5,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 15,
+                              horizontal: 30
+                            )
+                          ),
+                          child: Text(
+                            "Delete",
+                            style: TextStyle(
+                              color: Theme.of(context).textTheme.bodySmall?.color,
+                              fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              deleteState = false;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColorLight,
+                            foregroundColor: Theme.of(context).primaryColorDark,
+                            elevation: 5,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 15,
+                              horizontal: 30
+                            )
+                          ),
+                          child: Text(
+                            "Cancel",
+                            style: TextStyle(
+                              color: Theme.of(context).textTheme.bodySmall?.color,
+                              fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                              fontSize: 18,
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            )
+          ),
+        ),
+        Visibility(
           visible: genStatement,
           child: Positioned(
             child: Container(
@@ -1572,8 +1950,8 @@ class _ClientProfileState extends State<ClientProfile> {
                   color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
                 ),
                 padding: EdgeInsets.only(
-                  top: screenHeight * 0.35,
-                  bottom: screenHeight * 0.35,
+                  top: screenHeight * 0.33,
+                  bottom: screenHeight * 0.33,
                   left: screenWidth * 0.33,
                   right: screenWidth * 0.33,
                 ),
@@ -1623,6 +2001,19 @@ class _ClientProfileState extends State<ClientProfile> {
                               fontWeight: FontWeight.w400,
                             ),
                             textAlign: TextAlign.left,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      children: [
+                        SizedBox(width: 30,),
+                        Text(
+                          "Statement Number: ${state.toString()}",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 22,
                           ),
                         ),
                       ],
@@ -1697,7 +2088,11 @@ class _ClientProfileState extends State<ClientProfile> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-
+                            setState(() {
+                              genStatement = false;
+                            });
+                            getTermInvoices();
+                            createStatementPDF();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Theme.of(context).primaryColorLight,

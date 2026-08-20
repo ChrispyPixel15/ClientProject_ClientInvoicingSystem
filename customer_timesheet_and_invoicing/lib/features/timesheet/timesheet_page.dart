@@ -274,8 +274,7 @@ class _TimesheetState extends State<Timesheet> {
 
     return Stack(
       children: [
-      SingleChildScrollView(
-        child: Center(
+      Center(
           child: Column(
             children: [
               SizedBox(height: 40,),
@@ -541,193 +540,200 @@ class _TimesheetState extends State<Timesheet> {
                                 ),
                               ),
                             ),
-                            SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  for(var client in clientList) 
-                                    Container(
-                                      width: double.infinity,
-                                      padding: EdgeInsets.only(
-                                        left: 30,
-                                      ),
-                                      child: TextButton(
-                                        style: TextButton.styleFrom(
-                                          alignment: Alignment.centerLeft,
-                                          foregroundColor: Colors.black.withValues(alpha: 1),
-                                          overlayColor: Colors.black,
-                                          shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.zero,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          client['client_bus_name'],
-                                          style: TextStyle(
-                                            color: Theme.of(context).textTheme.bodySmall?.color,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.normal,
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          sortByClient(client["client_bus_name"]);
-                                        },
-                                      )
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: clientList.length,
+                                itemBuilder: (context, index) {
+                                  final client = clientList[index];
+                                  return Container(
+                                    width: double.infinity,
+                                    padding: EdgeInsets.only(
+                                      left: 30,
                                     ),
-                                ],
+                                    child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        alignment: Alignment.centerLeft,
+                                        foregroundColor: Colors.black.withValues(alpha: 1),
+                                        overlayColor: Colors.black,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.zero,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        client['client_bus_name'],
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        sortByClient(client["client_bus_name"]);
+                                      },
+                                    )
+                                  );
+                                },
                               ),
-                            ),
+                            )
                           ],
                         )
                       ),
                     ),
                     Expanded(
                       flex: 5,
-                      child: Container(
-                        height: screenHeight * 0.8,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Theme.of(context).highlightColor,
-                            width: 1
-                          ),
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(10),
-                            bottomRight: Radius.circular(10)
-                          ),
-                          color: Theme.of(context).primaryColor,
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          bottomRight: Radius.circular(10),
                         ),
-                        child: Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColorDark,
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Theme.of(context).highlightColor,
+                        child: Container(
+                          height: screenHeight * 0.8,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Theme.of(context).highlightColor,
+                              width: 1
+                            ),
+                            borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(10),
+                              bottomRight: Radius.circular(10)
+                            ),
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColorDark,
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: Theme.of(context).highlightColor,
+                                    )
+                                  ),
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(10)
                                   )
                                 ),
-                                borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(10)
-                                )
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: Container(
+                                        padding: EdgeInsets.only(
+                                          left: 10,
+                                          top: 5,
+                                          bottom: 5
+                                        ),
+                                        child: Text(
+                                          "Task",
+                                          style: TextStyle(
+                                            color: Theme.of(context).textTheme.bodySmall?.color,
+                                          ),
+                                        )
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Container(
+                                        padding: EdgeInsets.only(
+                                          left: 10,
+                                          top: 5,
+                                          bottom: 5
+                                        ),
+                                        child: Text(
+                                          "Purchase Order Number",
+                                          style: TextStyle(
+                                            color: Theme.of(context).textTheme.bodySmall?.color,
+                                          ),
+                                        )
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        padding: EdgeInsets.only(
+                                          left: 10,
+                                          top: 5,
+                                          bottom: 5
+                                        ),
+                                        child: Text(
+                                          "Client",
+                                          style: TextStyle(
+                                            color: Theme.of(context).textTheme.bodySmall?.color,
+                                          ),
+                                        )
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Container(
+                                        padding: EdgeInsets.only(
+                                          left: 10,
+                                          top: 5,
+                                          bottom: 5
+                                        ),
+                                        child: Text(
+                                          "Date",
+                                          style: TextStyle(
+                                            color: Theme.of(context).textTheme.bodySmall?.color,
+                                          ),
+                                        )
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Container(
+                                        padding: EdgeInsets.only(
+                                          left: 10,
+                                          top: 5,
+                                          bottom: 5
+                                        ),
+                                        child: Text(
+                                          "Units",
+                                          style: TextStyle(
+                                            color: Theme.of(context).textTheme.bodySmall?.color,
+                                          ),
+                                        )
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Container(
+                                        padding: EdgeInsets.only(
+                                          left: 10,
+                                          top: 5,
+                                          bottom: 5
+                                        ),
+                                        child: Text(
+                                          "",
+                                          style: TextStyle(
+                                            color: Theme.of(context).textTheme.bodySmall?.color,
+                                          ),
+                                        )
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 3,
-                                    child: Container(
-                                      padding: EdgeInsets.only(
-                                        left: 10,
-                                        top: 5,
-                                        bottom: 5
-                                      ),
-                                      child: Text(
-                                        "Task",
-                                        style: TextStyle(
-                                          color: Theme.of(context).textTheme.bodySmall?.color,
-                                        ),
-                                      )
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: Container(
-                                      padding: EdgeInsets.only(
-                                        left: 10,
-                                        top: 5,
-                                        bottom: 5
-                                      ),
-                                      child: Text(
-                                        "Purchase Order Number",
-                                        style: TextStyle(
-                                          color: Theme.of(context).textTheme.bodySmall?.color,
-                                        ),
-                                      )
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.only(
-                                        left: 10,
-                                        top: 5,
-                                        bottom: 5
-                                      ),
-                                      child: Text(
-                                        "Client",
-                                        style: TextStyle(
-                                          color: Theme.of(context).textTheme.bodySmall?.color,
-                                        ),
-                                      )
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Container(
-                                      padding: EdgeInsets.only(
-                                        left: 10,
-                                        top: 5,
-                                        bottom: 5
-                                      ),
-                                      child: Text(
-                                        "Date",
-                                        style: TextStyle(
-                                          color: Theme.of(context).textTheme.bodySmall?.color,
-                                        ),
-                                      )
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Container(
-                                      padding: EdgeInsets.only(
-                                        left: 10,
-                                        top: 5,
-                                        bottom: 5
-                                      ),
-                                      child: Text(
-                                        "Hours",
-                                        style: TextStyle(
-                                          color: Theme.of(context).textTheme.bodySmall?.color,
-                                        ),
-                                      )
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Container(
-                                      padding: EdgeInsets.only(
-                                        left: 10,
-                                        top: 5,
-                                        bottom: 5
-                                      ),
-                                      child: Text(
-                                        "",
-                                        style: TextStyle(
-                                          color: Theme.of(context).textTheme.bodySmall?.color,
-                                        ),
-                                      )
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  for (var task in timesheetTaskList)
-                                    TimeTaskListItem(
-                                      id: task['id'], 
-                                      task: task['task_fk'], 
-                                      pos: task['pos_fk'], 
-                                      client: task['client_fk'], 
-                                      date: task['date'], 
-                                      hours: task['hours'].toString(), 
-                                      invoiced: task['invoiced'], 
-                                      rowColor: Theme.of(context).primaryColor, 
-                                      deleteFunc: activateDelete,
-                                      editFunc: activateEdit,
-                                    )
-                                ],
-                              ),
-                            )
-                          ],
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: timesheetTaskList.length,
+                                  itemBuilder: (context, index) {
+                                    final task = timesheetTaskList[index];
+                                    return TimeTaskListItem(
+                                        id: task['id'], 
+                                        task: task['task_fk'], 
+                                        pos: task['pos_fk'], 
+                                        client: task['client_fk'], 
+                                        date: task['date'], 
+                                        hours: task['hours'].toString(), 
+                                        invoiced: task['invoiced'], 
+                                        rowColor: Theme.of(context).primaryColor, 
+                                        deleteFunc: activateDelete,
+                                        editFunc: activateEdit,
+                                      );
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -737,7 +743,6 @@ class _TimesheetState extends State<Timesheet> {
             ],
           ),
         ),
-      ),
       Visibility(
         visible: addTask,
         child: Positioned(
@@ -1050,7 +1055,7 @@ class _TimesheetState extends State<Timesheet> {
                     SizedBox(
                       height: 20,
                     ),
-                    CustomTextInput(labelName: "Hours Spent", hintText: "Hours Spent...", password: false, inputController: _hoursController),
+                    CustomTextInput(labelName: "Total Units", hintText: "Total Units...", password: false, inputController: _hoursController),
                     SizedBox(
                       height: 30,
                     ),

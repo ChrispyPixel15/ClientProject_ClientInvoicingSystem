@@ -162,7 +162,7 @@ class _SetupTwoState extends State<SetupTwo> {
                         postalCode: int.parse(_postalCodeController.text),
                         bank: _bankController.text,
                         branchCode: int.parse(_branchCodeController.text),
-                        bic: int.parse(_bicController.text),
+                        bic: _bicController.text.trim().isEmpty ? 0 : int.parse(_bicController.text),
                         accountNumber: int.parse(_accountNumberController.text),
                       );
                       widget.onPressed();                      

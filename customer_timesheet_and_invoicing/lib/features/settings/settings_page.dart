@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:customer_timesheet_and_invoicing/core/theme_controller.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/pos_creation_services.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/task_creation_service.dart';
 import 'package:customer_timesheet_and_invoicing/data/services/user_creation_service.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 const List<Widget> themes = <Widget> [
@@ -27,6 +30,9 @@ class _SettingsState extends State<Settings> {
   bool editTasks = false;
   bool editPOS = false;
 
+  File? _imageFile;
+  String _imagePath = ""; 
+
   List<Map<String, dynamic>> taskList = [];
   List<Map<String, dynamic>> posList = [];
 
@@ -37,7 +43,11 @@ class _SettingsState extends State<Settings> {
     super.initState();
     getUserData();
     loadTasks();
-    getPoss();
+    getPoss();   
+  }
+
+  Future<bool> fileExists(String path) async {
+    return File(path).exists();
   }
 
   Future<void> getUserData() async {
@@ -77,6 +87,25 @@ class _SettingsState extends State<Settings> {
    Future<void> deletePOS(String task) async {
     await posService.deletePos(task);
     getPoss();
+  }
+
+  Future<void> pickImage() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+    );
+
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        _imageFile = File(result.files.single.path!);
+        _imagePath = _imageFile!.path; 
+      });
+
+      await userCreationServices.updateUser({
+        'logo_dir': _imagePath,
+      });
+      getUserData();
+      debugPrint(_imagePath);
+    }
   }
 
   @override
@@ -571,81 +600,148 @@ class _SettingsState extends State<Settings> {
                   ),
                   SizedBox(height: 40,),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Other Settings",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 25,),
-                  Row(
-                    children: [
-                      Row(
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColorLight,
-                              foregroundColor: Theme.of(context).primaryColorDark,
-                              elevation: 5,
-                              padding: EdgeInsets.symmetric(
-                                vertical: 15,
-                                horizontal: 30
-                              )
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                editTasks = true;
-                              });
-                            }, 
-                            child: Text(
-                              "Edit Task List",
-                              style: TextStyle(
-                                color: Theme.of(context).textTheme.bodySmall?.color,
-                                fontSize: 18
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Other Settings",
+                                style: TextStyle(
+                                  color: Theme.of(context).textTheme.bodySmall?.color,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25
+                                ),
                               ),
-                            ),
+                            ],
+                          ),
+                          SizedBox(height: 25,),
+                          Row(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context).primaryColorLight,
+                                      foregroundColor: Theme.of(context).primaryColorDark,
+                                      elevation: 5,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 15,
+                                        horizontal: 30
+                                      )
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        editTasks = true;
+                                      });
+                                    }, 
+                                    child: Text(
+                                      "Edit Task List",
+                                      style: TextStyle(
+                                        color: Theme.of(context).textTheme.bodySmall?.color,
+                                        fontSize: 18
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context).primaryColorLight,
+                                      foregroundColor: Theme.of(context).primaryColorDark,
+                                      elevation: 5,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 15,
+                                        horizontal: 30
+                                      )
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        editPOS = true;
+                                      });                          
+                                    }, 
+                                    child: Text(
+                                      "Edit POS List",
+                                      style: TextStyle(
+                                        color: Theme.of(context).textTheme.bodySmall?.color,
+                                        fontSize: 18
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      SizedBox(width: 10,),
-                      Row(
+                      SizedBox(width: 40,),
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColorLight,
-                              foregroundColor: Theme.of(context).primaryColorDark,
-                              elevation: 5,
-                              padding: EdgeInsets.symmetric(
-                                vertical: 15,
-                                horizontal: 30
-                              )
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                editPOS = true;
-                              });                          
-                            }, 
-                            child: Text(
-                              "Edit POS List",
-                              style: TextStyle(
-                                color: Theme.of(context).textTheme.bodySmall?.color,
-                                fontSize: 18
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Logo",
+                                style: TextStyle(
+                                  color: Theme.of(context).textTheme.bodySmall?.color,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25
+                                ),
                               ),
-                            ),
+                            ],
+                          ),
+                          SizedBox(height: 25,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(context).primaryColorLight,
+                                  foregroundColor: Theme.of(context).primaryColorDark,
+                                  elevation: 5,
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 15,
+                                    horizontal: 30
+                                  )
+                                ),
+                                onPressed: () {
+                                  pickImage();
+                                }, 
+                                child: Text(
+                                  "Choose",
+                                  style: TextStyle(
+                                    color: Theme.of(context).textTheme.bodySmall?.color,
+                                    fontSize: 18
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 30,),
+                              Image(
+                                image: (user != null && user!['logo_dir'] != null && File(user!['logo_dir']).existsSync())
+                                    ? FileImage(File(user!['logo_dir']))
+                                    : const AssetImage('lib/assets/default.png') as ImageProvider,
+                                width: 100,
+                                height: 100,
+                              ),
+                            ],
                           ),
                         ],
-                      ),
+                      )
                     ],
                   ),
-                  SizedBox(height: 40,),
+                  SizedBox(height: 20,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [

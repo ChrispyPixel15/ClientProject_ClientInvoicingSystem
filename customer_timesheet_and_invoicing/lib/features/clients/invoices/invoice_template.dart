@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf_maker/pdf_maker.dart';
@@ -29,7 +31,10 @@ class InvoiceTemplate extends BlankPage {
   final String userBranchCode;
   final String userBic;
   final String vatReg;
+  final String logo;
+  final DateTime? invoiceDate;
   final List<Map<String, dynamic>> selectedInvoiceData;
+
 
   const InvoiceTemplate({
     super.key,
@@ -59,7 +64,9 @@ class InvoiceTemplate extends BlankPage {
     required this.userAccountName,
     required this.userBranchCode,
     required this.userBic,
-    required this.vatReg
+    required this.vatReg,
+    required this.logo,
+    required this.invoiceDate
   });
 
   @override
@@ -79,6 +86,13 @@ class InvoiceTemplate extends BlankPage {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Image(
+                image: (File(logo).existsSync())
+                    ? FileImage(File(logo))
+                    : const AssetImage('lib/assets/default.png') as ImageProvider,
+                width: 150,
+                height: 150,
+              ),
               Text(
                 "Tax Invoice",
                 style: TextStyle(
@@ -181,11 +195,11 @@ class InvoiceTemplate extends BlankPage {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    DateFormat('dd-MM-yyyy').format(today),
+                    "Date Issued: ${DateFormat('dd-MM-yyyy').format(invoiceDate!)}",
                     textAlign: TextAlign.left,
                   ),
                   Text(
-                    DateFormat('dd-MM-yyyy').format(today.add(Duration(days: termDays))),
+                    "Due Date: ${DateFormat('dd-MM-yyyy').format(invoiceDate!.add(Duration(days: termDays)))}",
                     textAlign: TextAlign.left,
                   ),
                 ],

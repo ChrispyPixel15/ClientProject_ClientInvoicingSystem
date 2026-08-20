@@ -52,7 +52,8 @@ class AppDatabase {
         account_number INTEGER,
         theme TEXT,
         password TEXT,
-        default_email TEXT
+        default_email TEXT,
+        logo_dir TEXT
       )
       '''
     );
@@ -112,6 +113,7 @@ class AppDatabase {
       '''
     );
 
+//somehow add amounts to these
     await db.execute(
       '''
       CREATE TABLE invoices (
@@ -121,7 +123,8 @@ class AppDatabase {
         date TEXT,
         paid TEXT,
         date_paid TEXT,
-        dir TEXT,
+        dir TEXT, 
+        total_amount TEXT,
         FOREIGN KEY (client_fk) REFERENCES clients(client_bus_name)
       )
       '''
