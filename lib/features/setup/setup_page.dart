@@ -80,7 +80,7 @@ class _SetupPageState extends State<SetupPage> {
   }
 
   void openData() async {
-    await AppDatabase.instance.getDatabase(_draft.password!);
+    await AppDatabase.instance.getDatabase();
     finalUserSetup();
   }
 
@@ -110,9 +110,9 @@ class _SetupPageState extends State<SetupPage> {
       'password': _draft.password,
       'default_email': "",
       'logo_dir': "",
-    }, _draft.password!);
+    });
 
-    var user = userService.getUserProfile(_draft.password!);
+    var user = userService.getUserProfile();
     savePassword(_draft.password!);
     debugPrint(user.toString());
   }

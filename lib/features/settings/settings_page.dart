@@ -51,7 +51,7 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> getUserData() async {
-    final result = await userCreationServices.getUserProfile(user!['password']);
+    final result = await userCreationServices.getUserProfile();
     setState(() {
       user = result;
       debugPrint(result.toString());
@@ -62,30 +62,30 @@ class _SettingsState extends State<Settings> {
   Future<void> updateDefaultEmail(String email) async {
     await userCreationServices.updateUser({
       'default_email': email,
-    }, user!['password']);
+    }, );
     getUserData();
   }
 
   Future<void> loadTasks() async {
-    final result = await taskServices.getTaskItems(user!['password']);
+    final result = await taskServices.getTaskItems();
     setState(() {
       taskList = result;
     });
   }
 
   Future<void> getPoss() async {
-    final result = await posService.getPosItems(user!['password']);
+    final result = await posService.getPosItems();
     setState(() {
       posList = result;
     });
   }
 
   Future<void> deleteTask(String task) async {
-    await taskServices.deleteTask(task, user!['password']);
+    await taskServices.deleteTask(task, );
     loadTasks();
   }
    Future<void> deletePOS(String task) async {
-    await posService.deletePos(task, user!['password']);
+    await posService.deletePos(task, );
     getPoss();
   }
 
@@ -102,7 +102,7 @@ class _SettingsState extends State<Settings> {
 
       await userCreationServices.updateUser({
         'logo_dir': _imagePath,
-      }, user!['password']);
+      }, );
       getUserData();
       debugPrint(_imagePath);
     }

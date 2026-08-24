@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       inputerr = false;
     });
-    await AppDatabase.instance.getDatabase(savedPassword);
+    await AppDatabase.instance.getDatabase();
     loginNav();
   }
   else {

@@ -124,7 +124,7 @@ class _ClientProfileState extends State<ClientProfile> {
   }
 
   Future<void> getUserData() async {
-    final result = await userCreationServices.getUserProfile(user!['password']);
+    final result = await userCreationServices.getUserProfile();
     setState(() {
       user = result;
       debugPrint(user.toString());
@@ -138,7 +138,7 @@ class _ClientProfileState extends State<ClientProfile> {
 
 
   Future<void> loadClient() async {
-    final result = await clientServices.getClient(widget.clientID, user!['password']);
+    final result = await clientServices.getClient(widget.clientID);
     setState(() {
       currentClient = result;
      _notesController.text = result!['notes'] == null ? "" : result['notes'];
@@ -148,12 +148,12 @@ class _ClientProfileState extends State<ClientProfile> {
   Future<void> updateClientNotes(String note) async {
     await clientServices.updateClient(widget.clientID, {
       'notes': note,
-    }, user!['password']);
+    });
     loadClient();
   }
 
   Future<void> getClientTaskList() async {
-    final result = await timesheetTaskServices.getTimesheetTasks(user!['password']);
+    final result = await timesheetTaskServices.getTimesheetTasks();
     List<Map<String, dynamic>> newList = List<Map<String, dynamic>>.from(result.where((item) {
       return item["client_fk"].contains(currentClient!["client_bus_name"]);
     }));
@@ -170,17 +170,17 @@ class _ClientProfileState extends State<ClientProfile> {
       'client_fk': client,
       'date': date,
       'hours': hours,
-    }, user!['password']);
+    });
     await getClientTaskList();
   }
 
   Future<void> deleteTimeTask(int id) async {
-    await timesheetTaskServices.deleteTimehseetTask(id, user!['password']);
+    await timesheetTaskServices.deleteTimehseetTask(id);
     getClientTaskList();
   }
 
   Future<void> getClientInvoices() async {
-    final result = await invoiceServices.getInvoices(user!['password']);
+    final result = await invoiceServices.getInvoices();
     List<Map<String, dynamic>> newList = List<Map<String, dynamic>>.from(result.where((invoice) {
       return invoice["client_fk"].contains(currentClient!["client_bus_name"]);
     }));
@@ -191,7 +191,7 @@ class _ClientProfileState extends State<ClientProfile> {
   }
 
   Future<void> getClientStatements() async {
-    final result = await clientStatementServices.getClientStatements(user!['password']);
+    final result = await clientStatementServices.getClientStatements();
     List<Map<String, dynamic>> newList = List<Map<String, dynamic>>.from(result.where((statement) {
       return statement["client_fk"].contains(currentClient!["client_bus_name"]);
     }));
@@ -201,7 +201,7 @@ class _ClientProfileState extends State<ClientProfile> {
   }
 
   Future<void> getUninvoicedTasks() async {
-    final result = await timesheetTaskServices.getTimesheetTasks(user!['password']);
+    final result = await timesheetTaskServices.getTimesheetTasks();
     List<Map<String, dynamic>> tempList = List<Map<String, dynamic>>.from(result.where((item) {
       return item["client_fk"].contains(currentClient!["client_bus_name"]);
     }));
@@ -215,14 +215,14 @@ class _ClientProfileState extends State<ClientProfile> {
   Future<void> addUnpaidAmountInvoices() async {
      await clientServices.updateClient(widget.clientID, {
       'unpaid_invoices': currentClient!['unpaid_invoices'] + 1
-    }, user!['password']);
+    });
     loadClient();
   }
 
   Future<void> removeUnpaidAmountInvoices() async {
      await clientServices.updateClient(widget.clientID, {
       'unpaid_invoices': currentClient!['unpaid_invoices'] - 1
-    }, user!['password']);
+    });
     loadClient();
   }
 
@@ -240,30 +240,30 @@ class _ClientProfileState extends State<ClientProfile> {
       'paid': 'false',
       'total_amount': amount.toString(),
       'dir': directory
-    }, user!['password']);
+    }, );
     await userCreationServices.updateUser({
       'recent_invoice': user!['recent_invoice'] + 1,
-    }, user!['password']);
+    }, );
     await getUserData();
     await getClientInvoices();
     addUnpaidAmountInvoices();
   }
 
   Future<void> generateInvoiceDB(int invoiceNumber) async {
-    await invoiceServices.createInvoiceDB(invoiceNumber, user!['password']);
-    final result = invoiceServices.getInvoices(user!['password']);
+    await invoiceServices.createInvoiceDB(invoiceNumber, );
+    final result = invoiceServices.getInvoices();
     debugPrint("This is the result: ${result.toString()}");
-    final res = invoiceServices.getInvoiceData(invoiceNumber, user!['password']);
+    final res = invoiceServices.getInvoiceData(invoiceNumber, );
     debugPrint(res.toString());
   }
 
   Future<void> deleteInvoiceDataBase(int invoiceNumber) async {
-    final result = await invoiceServices.getInvoiceData(invoiceNumber, user!['password']);
+    final result = await invoiceServices.getInvoiceData(invoiceNumber, );
     debugPrint(result.toString());
     for (var res in result) {
       updateTimeTaskInvoiced(res['id'], false);
     }
-    await invoiceServices.deleteInvoiceDB(invoiceNumber, user!['password']);
+    await invoiceServices.deleteInvoiceDB(invoiceNumber, );
     getClientTaskList();
   }
 
@@ -271,11 +271,11 @@ class _ClientProfileState extends State<ClientProfile> {
     deleteInvoiceDataBase(invoiceNum);
     deleteFile(invoiceNum);
     removeUnpaidAmountInvoices();
-    await invoiceServices.deleteInvoice(invoiceNum, user!['password']);
-    await invoiceServices.deleteInvoiceDB(invoiceNum, user!['password']);
+    await invoiceServices.deleteInvoice(invoiceNum, );
+    await invoiceServices.deleteInvoiceDB(invoiceNum, );
     await userCreationServices.updateUser({
       'recent_invoice': user!['recent_invoice'] - 1,
-    }, user!['password']);
+    }, );
     await getUserData();
     await getClientInvoices();
     getClientTaskList();
@@ -291,12 +291,12 @@ class _ClientProfileState extends State<ClientProfile> {
   }
 
   Future<void> addTasktoInvoice(Map<String, dynamic> values) async {
-    await invoiceServices.addInvoiceItem(values, inv, user!['password']);
+    await invoiceServices.addInvoiceItem(values, inv, );
     getSelectedInvoice(inv);
   }
 
   Future<void> deleteTaskFromInvoice(String task) async {
-    await invoiceServices.deleteInvoiceItem(task, inv, user!['password']);
+    await invoiceServices.deleteInvoiceItem(task, inv, );
   }
 
   Future<void> payInvoice(int id, bool paid) async {
@@ -307,22 +307,22 @@ class _ClientProfileState extends State<ClientProfile> {
       await invoiceServices.updateInvoice(id, {
         'paid': paid.toString(),
         'date_paid': '${now.day}-${now.month}-${now.year}',
-      }, user!['password']);
+      }, );
     }
     else {
       addUnpaidAmountInvoices();
       await invoiceServices.updateInvoice(id, {
         'paid': paid.toString(),
         'date_paid': "",
-      }, user!['password']);
+      }, );
     }
-    final res = invoiceServices.getInvoices(user!['password']);
+    final res = invoiceServices.getInvoices();
     debugPrint(res.toString());
     getClientInvoices();
   }
 
   Future<void> getSelectedInvoice(int invoiceNum) async {
-    final result = await invoiceServices.getInvoiceData(invoiceNum, user!['password']);
+    final result = await invoiceServices.getInvoiceData(invoiceNum, );
     setState(() {
       selectedInvoiceData = result;
       debugPrint(selectedInvoiceData.toString());
@@ -332,7 +332,7 @@ class _ClientProfileState extends State<ClientProfile> {
   Future<void> updateTimeTaskInvoiced(int id, bool invoiced) async {
     await timesheetTaskServices.updateTimesheetTask(id, {
       'invoiced': invoiced.toString(),
-    }, user!['password']);
+    }, );
     getClientTaskList();
   }
 
@@ -528,10 +528,10 @@ class _ClientProfileState extends State<ClientProfile> {
       'statement_number': state,
       'date': '${DateTime.now().day}-${DateTime.now().month}-${DateTime.now().year}',
       'dir': directory
-    }, user!['password']);
+    }, );
     await userCreationServices.updateUser({
       'recent_statement': user!['recent_statement'] + 1,
-    }, user!['password']);
+    }, );
     await getUserData();
     getClientStatements();
   }
@@ -602,10 +602,10 @@ class _ClientProfileState extends State<ClientProfile> {
 
   Future<void> deleteSattementItem(int statementNum) async {
     deleteStatement(statementNum);
-    await clientStatementServices.deleteClientStatement(statementNum, user!['password']);
+    await clientStatementServices.deleteClientStatement(statementNum, );
     await userCreationServices.updateUser({
       'recent_statement': user!['recent_statement'] - 1,
-    }, user!['password']);
+    }, );
     await getUserData();
     getClientStatements();
   }

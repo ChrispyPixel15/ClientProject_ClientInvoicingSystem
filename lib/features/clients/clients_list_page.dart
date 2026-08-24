@@ -69,21 +69,21 @@ class _ClientsState extends State<Clients> {
   }
 
   Future<void> getUserData() async {
-    final result = await userCreationServices.getUserProfile(user!['password']);
+    final result = await userCreationServices.getUserProfile();
     setState(() {
       user = result;
     });
   }
 
   Future<void> loadClients() async {
-    final result = await clientServices.getClients(user!['password']);
+    final result = await clientServices.getClients();
     setState(() {
       clientList = result;
     });
   }
 
   Future<void> getInvoices() async {
-    final result = await invoiceServices.getInvoices(user!['password']);
+    final result = await invoiceServices.getInvoices();
     setState(() {
       invoiceList = result;
     });
@@ -120,19 +120,19 @@ class _ClientsState extends State<Clients> {
       'client_payment_term': paymentTerm,
       'status': "active",
       'unpaid_invoices': 0,
-    }, user!['password']);
+    }, );
     await loadClients();
   }
 
   Future<void> deleteClient({String? id}) async {
-    await clientServices.deleteClient(id, user!['password']);
+    await clientServices.deleteClient(id, );
     loadClients();
   }
 
   Future<void> updateClientStatus({String? id, String? status}) async {
     await clientServices.updateClient(id, {
       'status': status,
-    }, user!['password']);
+    }, );
     loadClients();
   }
 
@@ -161,7 +161,7 @@ class _ClientsState extends State<Clients> {
       'client_postal_code': postalCode,
       'client_price_ph': quotePrice,
       'client_payment_term': paymentTerm,
-    }, user!['password']);
+    }, );
     loadClients();
   }
 
@@ -363,7 +363,7 @@ class _ClientsState extends State<Clients> {
     }
 
     void activateEdit(String id, bool edit) async {
-      final result = await clientServices.getClient(id, user!['password']);
+      final result = await clientServices.getClient(id, );
       _clientNameController.text = result!["client_bus_name"];
       _contactNumberController.text = result["client_contact_number"].toString();
       _contactPersonController.text = result["client_contact_person"];

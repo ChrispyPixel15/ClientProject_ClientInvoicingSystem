@@ -1,6 +1,7 @@
 import 'dart:io';
+import 'package:customer_timesheet_and_invoicing/core/storage.dart';
 import 'package:path/path.dart';
-import 'package:sqflite_sqlcipher/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class AppDatabase {
   static const _dbName = 'cti_data.db';
@@ -11,22 +12,25 @@ class AppDatabase {
 
   AppDatabase._internal();
 
-  Future<Database> getDatabase (String appPassword) async {
+  Future<Database> getDatabase () async {
     if (_database != null) return _database!;
-    _database = await _openDatabase(appPassword);
+    _database = await _openDatabase();
     return _database!;
   }
 
-  Future<Database> _openDatabase(String appPassword) async {
+  Future<Database> _openDatabase() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, _dbName);
+    final savedPassword = await SecureStorageService.storage.read(key: 'app_password');
 
-    return openDatabase(
+    final db = await openDatabase(
       path,
-      password: appPassword,
       version: _dbVersion,
       onCreate: _onCreate,
     );
+
+    await db.execute("PRAGMA key = '$savedPassword';");
+    return db;
   }
 
   Future<void> closeDatabase() async {

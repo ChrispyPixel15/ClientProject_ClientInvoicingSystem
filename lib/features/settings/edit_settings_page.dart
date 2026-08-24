@@ -39,7 +39,7 @@ class _EditSettingsState extends State<EditSettings> {
   }
 
   Future<void> getUserData() async {
-    final result = await userCreationServices.getUserProfile(user!['password']);
+    final result = await userCreationServices.getUserProfile();
     setState(() {
       user = result;
       _nameController.text = result!['name'] == null ? "" : result['name'];
@@ -81,7 +81,7 @@ class _EditSettingsState extends State<EditSettings> {
       'branch_code': int.parse(_branchCodeController.text),
       'bic': int.parse(_bicController.text),
       'account_number': int.parse(_accountNumberController.text),
-    }, user!['password']);
+    }, );
   }
 
   @override

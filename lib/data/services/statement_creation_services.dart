@@ -1,10 +1,10 @@
 import 'package:customer_timesheet_and_invoicing/data/app_database.dart';
-import 'package:sqflite_sqlcipher/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 //Task list on timesheet that is attached to overall tasks
 
 class StatementCreationServices {
-  Future<void> createClientStatement(Map<String, dynamic> values, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<void> createClientStatement(Map<String, dynamic> values) async {
+    final db = await AppDatabase.instance.getDatabase();
     await db.insert(
       'client_statements',
       values,
@@ -12,8 +12,8 @@ class StatementCreationServices {
     );
   }
 
-  Future<void> createPersonalStatement(Map<String, dynamic> values, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<void> createPersonalStatement(Map<String, dynamic> values) async {
+    final db = await AppDatabase.instance.getDatabase();
     await db.insert(
       'personal_statements',
       values,
@@ -21,20 +21,20 @@ class StatementCreationServices {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getClientStatements(String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<List<Map<String, dynamic>>> getClientStatements() async {
+    final db = await AppDatabase.instance.getDatabase();
     final result = await db.query('client_statements');
     return result;
   }
 
-  Future<List<Map<String, dynamic>>> getPersonalStatements(String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<List<Map<String, dynamic>>> getPersonalStatements() async {
+    final db = await AppDatabase.instance.getDatabase();
     final result = await db.query('personal_statements');
     return result;
   }
 
-  Future<int> deleteClientStatement(int statementNum, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<int> deleteClientStatement(int statementNum) async {
+    final db = await AppDatabase.instance.getDatabase();
     return await db.delete(
       'client_statements',
       where: 'statement_number = ?',
@@ -42,8 +42,8 @@ class StatementCreationServices {
     );
   }
 
-  Future<int> deletePersonalStatement(int statementNum, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<int> deletePersonalStatement(int statementNum) async {
+    final db = await AppDatabase.instance.getDatabase();
     return await db.delete(
       'personal_statements',
       where: 'statement_number = ?',

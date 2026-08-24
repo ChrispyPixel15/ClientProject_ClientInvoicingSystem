@@ -72,14 +72,14 @@ class _TimesheetState extends State<Timesheet> {
   }
 
   Future<void> getUserData() async {
-    final result = await userCreationServices.getUserProfile(user!['password']);
+    final result = await userCreationServices.getUserProfile();
     setState(() {
       user = result;
     });
   }
 
   Future<void> loadUnpaidInvoices() async {
-    final result = await invoiceServices.getInvoices(user!['password']);
+    final result = await invoiceServices.getInvoices();
     DateFormat dateFormat = DateFormat("dd-MM-yyyy");
     
     List<Map<String, dynamic>> newInvoices =  List<Map<String, dynamic>>.from(result.where((invoice) {
@@ -96,7 +96,7 @@ class _TimesheetState extends State<Timesheet> {
   }
 
   Future<void> loadTasks() async {
-    final result = await taskServices.getTaskItems(user!['password']);
+    final result = await taskServices.getTaskItems();
     setState(() {
       taskList = result;
     });
@@ -105,19 +105,19 @@ class _TimesheetState extends State<Timesheet> {
   Future<void> addTasks(String task) async {
     await taskServices.createTaskItems({
       'task': task
-    }, user!['password']);
+    }, );
     await loadTasks();
   }
 
   Future<void> getClients() async {
-    final result = await clientServices.getClients(user!['password']);
+    final result = await clientServices.getClients();
     setState(() {
       clientList = result;
     });
   }
 
   Future<void> getPoss() async {
-    final result = await posServices.getPosItems(user!['password']);
+    final result = await posServices.getPosItems();
     setState(() {
       posList = result;
     });
@@ -126,12 +126,12 @@ class _TimesheetState extends State<Timesheet> {
   Future<void> addPos(String pos) async {
     await posServices.createPosItem({
       'pos': pos
-    }, user!['password']);
+    }, );
     await getPoss();
   }
 
   Future<void> loadTimesheetTasks() async {
-    final result = await timesheetTaskServices.getTimesheetTasks(user!['password']);
+    final result = await timesheetTaskServices.getTimesheetTasks();
     setState(() {
       timesheetTaskList = result.reversed.toList();
     });
@@ -151,12 +151,12 @@ class _TimesheetState extends State<Timesheet> {
       'date': date,
       'hours': hours,
       'invoiced': "false",
-    }, user!['password']);
+    }, );
     await loadTimesheetTasks();
   }
 
   Future<void> deleteTimeTask(int id) async {
-    await timesheetTaskServices.deleteTimehseetTask(id, user!['password']);
+    await timesheetTaskServices.deleteTimehseetTask(id, );
     loadTimesheetTasks();
   }
 
@@ -167,7 +167,7 @@ class _TimesheetState extends State<Timesheet> {
       'client_fk': client,
       'date': date,
       'hours': hours,
-    }, user!['password']);
+    }, );
     await loadTimesheetTasks();
   }
 

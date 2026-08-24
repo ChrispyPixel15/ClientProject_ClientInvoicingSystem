@@ -6,14 +6,19 @@ class ThemeController {
   final ValueNotifier<ThemeData> themeNotifier = ValueNotifier(darkTheme);
   Map<String, dynamic>? user;
 
-  ThemeController() {
-    getThemeData();
+  ThemeController(bool setup) {
+    getThemeData(setup);
   }
 
-  Future<void> getThemeData() async {
-    final result = await getUserProfile();
-    if (result != null) {
-      themeNotifier.value = result["theme"] == "dark" ? darkTheme : lightTheme;
+  Future<void> getThemeData(bool setup) async {
+    if (setup) {
+      final result = await getUserProfile();
+      if (result != null) {
+        themeNotifier.value = result["theme"] == "dark" ? darkTheme : lightTheme;
+      }
+      else {
+        themeNotifier.value = darkTheme;
+      }
     }
     else {
       themeNotifier.value = darkTheme;
@@ -27,13 +32,13 @@ class ThemeController {
   }
 
   Future<Map<String, dynamic>?> getUserProfile() async {
-    final db = await AppDatabase.instance.getDatabase(user!['password']);
+    final db = await AppDatabase.instance.getDatabase();
     final result = await db.query('user_profile', where: 'id = ?', whereArgs: [1]);
     return result.isNotEmpty ? result.first : null;
   }
 
   Future<int> updateUser(Map<String, dynamic> values) async {
-    final db = await AppDatabase.instance.getDatabase(user!['password']);
+    final db = await AppDatabase.instance.getDatabase();
     return await db.update(
       'user_profile',
       values,
@@ -46,12 +51,12 @@ class ThemeController {
     if (themeNotifier.value == darkTheme) {
       themeNotifier.value = lightTheme;
       updateUserProfile('light');
-      getThemeData();
+      getThemeData(true);
     }
     else {
       themeNotifier.value = darkTheme;
       updateUserProfile('dark');
-      getThemeData();
+      getThemeData(true);
     }
   }
 }

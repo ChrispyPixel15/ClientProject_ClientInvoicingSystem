@@ -1,10 +1,10 @@
 import 'package:customer_timesheet_and_invoicing/data/app_database.dart';
-import 'package:sqflite_sqlcipher/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 //Task list on timesheet that is attached to overall tasks
 
 class PosCreationServices {
-  Future<void> createPosItem(Map<String, dynamic> values, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<void> createPosItem(Map<String, dynamic> values) async {
+    final db = await AppDatabase.instance.getDatabase();
     await db.insert(
       'purchase_order_numbers',
       values,
@@ -12,14 +12,14 @@ class PosCreationServices {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getPosItems(String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<List<Map<String, dynamic>>> getPosItems() async {
+    final db = await AppDatabase.instance.getDatabase();
     final result = await db.query('purchase_order_numbers');
     return result;
   }
 
-  Future<int> deletePos(String pos, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<int> deletePos(String pos) async {
+    final db = await AppDatabase.instance.getDatabase();
     return await db.delete(
       'purchase_order_numbers',
       where: 'pos = ?',

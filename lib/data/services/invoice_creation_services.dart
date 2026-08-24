@@ -1,10 +1,10 @@
 import 'package:customer_timesheet_and_invoicing/data/app_database.dart';
-import 'package:sqflite_sqlcipher/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 //Task list on timesheet that is attached to overall tasks
 
 class InvoiceCreationServices {
-  Future<void> createInvoice(Map<String, dynamic> values, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<void> createInvoice(Map<String, dynamic> values) async {
+    final db = await AppDatabase.instance.getDatabase();
     await db.insert(
       'invoices',
       values,
@@ -12,14 +12,14 @@ class InvoiceCreationServices {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getInvoices(String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<List<Map<String, dynamic>>> getInvoices() async {
+    final db = await AppDatabase.instance.getDatabase();
     final result = await db.query('invoices');
     return result;
   }
 
-  Future<int> deleteInvoice(int invoiceNum, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<int> deleteInvoice(int invoiceNum) async {
+    final db = await AppDatabase.instance.getDatabase();
     return await db.delete(
       'invoices',
       where: 'invoice_number = ?',
@@ -27,8 +27,8 @@ class InvoiceCreationServices {
     );
   }
 
-  Future<int> updateInvoice(int? id, Map<String, dynamic> values, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<int> updateInvoice(int? id, Map<String, dynamic> values) async {
+    final db = await AppDatabase.instance.getDatabase();
     return await db.update(
       'invoices',
       values,
@@ -37,8 +37,8 @@ class InvoiceCreationServices {
     );
   }
 
-  Future<void> createInvoiceDB(int invoiceNum, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<void> createInvoiceDB(int invoiceNum) async {
+    final db = await AppDatabase.instance.getDatabase();
     await db.execute(
       '''
       CREATE TABLE invoice$invoiceNum (
@@ -55,19 +55,19 @@ class InvoiceCreationServices {
     );
   }
 
-  Future<void> deleteInvoiceDB(int invoiceNum, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<void> deleteInvoiceDB(int invoiceNum) async {
+    final db = await AppDatabase.instance.getDatabase();
     await db.execute('DROP TABLE IF EXISTS invoice$invoiceNum');
   }
 
-  Future<List<Map<String, dynamic>>> getInvoiceData(int invoiceNum, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<List<Map<String, dynamic>>> getInvoiceData(int invoiceNum) async {
+    final db = await AppDatabase.instance.getDatabase();
     final result = await db.query('invoice$invoiceNum');
     return result;
   }
 
-  Future<void> addInvoiceItem(Map<String, dynamic> values, int invoiceNum, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<void> addInvoiceItem(Map<String, dynamic> values, int invoiceNum) async {
+    final db = await AppDatabase.instance.getDatabase();
     await db.insert(
       "invoice$invoiceNum",
       values,
@@ -75,8 +75,8 @@ class InvoiceCreationServices {
     );
   }
 
-  Future<int> deleteInvoiceItem(String task, int invoiceNum, String appPassword) async {
-    final db = await AppDatabase.instance.getDatabase(appPassword);
+  Future<int> deleteInvoiceItem(String task, int invoiceNum) async {
+    final db = await AppDatabase.instance.getDatabase();
     return await db.delete(
       "invoice$invoiceNum",
       where: 'task_name = ?',
