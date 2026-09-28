@@ -10,7 +10,7 @@
 
 ## Overview
 
-![Timesheet](MDImages/ScreenShot1)
+![Timesheet](MDImages/ScreenShot1.png)
 
 This is a project for a client. The client requested a invoicing and time-sheet application that is more catered towards a sole proprietor. Thus with less features than bigger applications meant for corporations, and a simpler design. This application allows the user to keep track of their clients, their invoices sent, due and paid, and their tasks completed. The data is saved locally to avoid price increases that come with using cloud based storage.
  
