@@ -1,16 +1,31 @@
-# customer_timesheet_and_invoicing
+# Customer Invoicing and Timesheet Desktop Application
 
-A new Flutter project.
+## Table of Contents
 
-## Getting Started
+- [Overview](#overview)
+- [Built With](#built-with)
+- [Features](#features)
+<!-- - [Contact](#contact) -->
+<!-- - [Acknowledgements](#acknowledgements) -->
 
-This project is a starting point for a Flutter application.
+## Overview
 
-A few resources to get you started if this is your first Flutter project:
+This is a project for a client. The client requested a invoicing and time-sheet application that is more catered towards a sole proprietor. Thus with less features than bigger applications meant for corporations, and a simpler design. This application allows the user to keep track of their clients, their invoices sent, due and paid, and their tasks completed. The data is saved locally to avoid price increases that come with using cloud based storage.
+ 
+This was the first time I had used Dart and Flutter to create an application, and it was a very educational experience. It is in some cases easier to use than something such as React Native, as there is less tweaking necessary to achieve the desired actions and style. However, this can become a limitation in some aspects, as it makes styling in more detail more complicated. 
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Built With
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Flutter
+- Dart
+- SQLite
+
+## Features
+
+- Task tracking on Home Page
+- Client Recording
+- Invoice and Statement Generation
+
+<!-- ## Contact -->
+
+<!-- ## Acknowledgements -->
