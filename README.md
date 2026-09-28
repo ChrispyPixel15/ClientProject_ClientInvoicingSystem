@@ -5,8 +5,8 @@
 - [Overview](#overview)
 - [Built With](#built-with)
 - [Features](#features)
-- [Contact](#contact)
-- [Acknowledgements](#acknowledgements)
+<!-- - [Contact](#contact) -->
+<!-- - [Acknowledgements](#acknowledgements) -->
 
 ## Overview
 
@@ -26,6 +26,6 @@ This was the first time I had used Dart and Flutter to create an application, an
 - Client Recording
 - Invoice and Statement Generation
 
-<!-- ## Contact --/>
+<!-- ## Contact -->
 
-<!-- ## Acknowledgements --/>
+<!-- ## Acknowledgements -->
