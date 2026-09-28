@@ -9,7 +9,7 @@ class SetupTwo extends StatefulWidget {
     String? number, 
     String? userEmail,
     String? vatRegistered,
-    int? vatNum, 
+    String? vatNum, 
     int? vatPercentage,
     int? recentInvoice,
     String? streetAddress, 
@@ -17,9 +17,9 @@ class SetupTwo extends StatefulWidget {
     String? suburb, 
     int? postalCode,
     String? bank, 
-    int? branchCode, 
-    int? bic,
-    int? accountNumber, 
+    String? branchCode, 
+    String? bic,
+    String? accountNumber, 
     String? theme, 
     String? password, 
   }) updateUser;
@@ -137,9 +137,9 @@ class _SetupTwoState extends State<SetupTwo> {
                                   suburb: _suburbController.text,
                                   postalCode: int.parse(_postalCodeController.text),
                                   bank: _bankController.text,
-                                  branchCode: int.parse(_branchCodeController.text),
-                                  bic: _bicController.text.trim().isEmpty ? 0 : int.parse(_bicController.text),
-                                  accountNumber: int.parse(_accountNumberController.text),
+                                  branchCode: _branchCodeController.text,
+                                  bic: _bicController.text.trim().isEmpty ? "0" : _bicController.text,
+                                  accountNumber: _accountNumberController.text,
                                 );
                                 widget.onPressed();    
                                 setState(() {

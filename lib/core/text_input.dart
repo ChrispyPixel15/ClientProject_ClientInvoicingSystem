@@ -16,10 +16,13 @@ class CustomTextInput extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    
     return Column(
       children: [
         SizedBox(
-            width: 500,
+            width: screenWidth * 0.20,
             child: Text(
               labelName,
               textAlign: TextAlign.left,
@@ -30,7 +33,7 @@ class CustomTextInput extends StatelessWidget {
             ),
           ),
           SizedBox(
-            width: 530,
+            width: screenWidth * 0.20,
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),

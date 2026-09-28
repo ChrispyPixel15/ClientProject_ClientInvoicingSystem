@@ -113,919 +113,921 @@ class _SettingsState extends State<Settings> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
-    return Stack(
-      children: [
-        Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                padding: EdgeInsets.only(
-                  right: 50
-                ),
-                child: IconButton(
-                  onPressed: () {
-                    widget.onEditPressed(4, "Settings", "", true);
-                  }, 
-                  icon: Icon(
-                    Icons.edit_rounded,
-                    color: Theme.of(context).highlightColor,
-                  )
-                )
-              ),
-            ],
-          ),
-        Row(
+    return SingleChildScrollView(
+      child: Stack(
         children: [
-          Expanded(
-            flex: 1,
-            child: Container(
-              padding: EdgeInsets.only(
-                left: 50,
-                right: 50,
-                top: 50
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Business Details",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25
-                        ),
-                      ),
-                    ],
+          Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(
+                    right: 50
                   ),
-                  SizedBox(height: 25,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Name:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
+                  child: IconButton(
+                    onPressed: () {
+                      widget.onEditPressed(4, "Settings", "", true);
+                    }, 
+                    icon: Icon(
+                      Icons.edit_rounded,
+                      color: Theme.of(context).highlightColor,
+                    )
+                  )
+                ),
+              ],
+            ),
+          Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Container(
+                padding: EdgeInsets.only(
+                  left: 50,
+                  right: 50,
+                  top: 50
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Business Details",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25
+                          ),
                         ),
-                      ),
-                      Text(
-                        user?["name"] ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
+                      ],
+                    ),
+                    SizedBox(height: 25,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Name:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Business Name:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
+                        Text(
+                          user?["name"] ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Business Name:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      ),
-                      Text(
-                        user?["business_name"] ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
+                        Text(
+                          user?["business_name"] ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                       ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Phone Number:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      )
-                     ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Phone Number:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
+                        Text(
+                          user?["number"].toString().padLeft(10, '0') ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Email:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      ),
-                      Text(
-                        user?["number"].toString().padLeft(10, '0') ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
+                        Text(
+                          user?["email"] ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Last Invoice Number:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Email:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
+                        Text(
+                          user?["recent_invoice"].toString() ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Last Statement Number:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      ),
-                      Text(
-                        user?["email"] ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
+                        Text(
+                          user?["recent_statement"].toString() ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "VAT Registered:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Last Invoice Number:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
+                        Text(
+                          user?["vat_registered"] == "true" ? "Yes" : "No",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "VAT Number:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      ),
-                      Text(
-                        user?["recent_invoice"].toString() ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
+                        Text(
+                          user?["vat_number"].toString() ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "VAT Percentage:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Last Statement Number:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
+                        Text(
+                          user?["vat_percentage"].toString() ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 40,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Address",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25
+                          ),
                         ),
-                      ),
-                      Text(
-                        user?["recent_statement"].toString() ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
+                      ],
+                    ),
+                    SizedBox(height: 25,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Street Address:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "VAT Registered:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
+                        Text(
+                          user?["street_address"] ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "City:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      ),
-                      Text(
-                        user?["vat_registered"] == "true" ? "Yes" : "No",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
+                        Text(
+                          user?["city"] ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Suburb:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "VAT Number:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
+                        Text(
+                          user?["suburb"] ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Postal Code:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
                         ),
-                      ),
-                      Text(
-                        user?["vat_number"].toString() ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "VAT Percentage:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      Text(
-                        user?["vat_percentage"].toString() ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 40,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Address",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 25,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Street Address:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      Text(
-                        user?["street_address"] ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "City:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      Text(
-                        user?["city"] ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Suburb:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      Text(
-                        user?["suburb"] ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Postal Code:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      Text(
-                        user?["postal_code"].toString() ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
-                        ),
-                      )
-                    ],
-                  ),
-                ],
+                        Text(
+                          user?["postal_code"].toString() ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              padding: EdgeInsets.only(
-                left: 50,
-                right: 50,
-                top: 50
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Bank Account",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 25,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Bank:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      Text(
-                        user?["bank"] ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Branch Code:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      Text(
-                        user?["branch_code"].toString() ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "BIC:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      Text(
-                        user?["bic"].toString() ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Account Number:",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18
-                        ),
-                      ),
-                      Text(
-                        user?["account_number"].toString() ?? "",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 18
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 40,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Theme",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 25,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      ToggleButtons(
-                        direction: Axis.horizontal,
-                        isSelected: _selectedTheme,
-                        onPressed: (int index) {
-                          setState(() {
-                            for (int i = 0; i < _selectedTheme.length; i ++) {
-                              _selectedTheme[i] = i == index;
-                            }
-                            widget.themeController.toggleTheme();
-                          });
-                        },
-                        borderRadius: const BorderRadius.all(Radius.circular(8)),
-                        borderColor: Theme.of(context).highlightColor,
-                        selectedBorderColor: Theme.of(context).highlightColor,
-                        selectedColor: Theme.of(context).textTheme.bodySmall?.color,
-                        fillColor: Theme.of(context).primaryColorLight,
-                        color: Theme.of(context).textTheme.bodySmall?.color,
-                        disabledBorderColor: Theme.of(context).highlightColor,
-                        hoverColor: Theme.of(context).primaryColorDark,
-                        children: themes,                   
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 40,),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Other Settings",
-                                style: TextStyle(
-                                  color: Theme.of(context).textTheme.bodySmall?.color,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25
-                                ),
-                              ),
-                            ],
+            Expanded(
+              flex: 1,
+              child: Container(
+                padding: EdgeInsets.only(
+                  left: 50,
+                  right: 50,
+                  top: 50
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Bank Account",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25
                           ),
-                          SizedBox(height: 25,),
-                          Row(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Theme.of(context).primaryColorLight,
-                                      foregroundColor: Theme.of(context).primaryColorDark,
-                                      elevation: 5,
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 15,
-                                        horizontal: 30
-                                      )
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        editTasks = true;
-                                      });
-                                    }, 
-                                    child: Text(
-                                      "Edit Task List",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(width: 10,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Theme.of(context).primaryColorLight,
-                                      foregroundColor: Theme.of(context).primaryColorDark,
-                                      elevation: 5,
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 15,
-                                        horizontal: 30
-                                      )
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        editPOS = true;
-                                      });                          
-                                    }, 
-                                    child: Text(
-                                      "Edit POS List",
-                                      style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 25,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Bank:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
                           ),
-                        ],
-                      ),
-                      SizedBox(width: 40,),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Logo",
-                                style: TextStyle(
-                                  color: Theme.of(context).textTheme.bodySmall?.color,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25
-                                ),
-                              ),
-                            ],
+                        ),
+                        Text(
+                          user?["bank"] ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
                           ),
-                          SizedBox(height: 25,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).primaryColorLight,
-                                  foregroundColor: Theme.of(context).primaryColorDark,
-                                  elevation: 5,
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 15,
-                                    horizontal: 30
-                                  )
-                                ),
-                                onPressed: () {
-                                  pickImage();
-                                }, 
-                                child: Text(
-                                  "Choose",
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Branch Code:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
+                        ),
+                        Text(
+                          user?["branch_code"].toString() ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "BIC:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
+                        ),
+                        Text(
+                          user?["bic"].toString() ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Account Number:",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18
+                          ),
+                        ),
+                        Text(
+                          user?["account_number"].toString() ?? "",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 18
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 40,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Theme",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 25,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        ToggleButtons(
+                          direction: Axis.horizontal,
+                          isSelected: _selectedTheme,
+                          onPressed: (int index) {
+                            setState(() {
+                              for (int i = 0; i < _selectedTheme.length; i ++) {
+                                _selectedTheme[i] = i == index;
+                              }
+                              widget.themeController.toggleTheme();
+                            });
+                          },
+                          borderRadius: const BorderRadius.all(Radius.circular(8)),
+                          borderColor: Theme.of(context).highlightColor,
+                          selectedBorderColor: Theme.of(context).highlightColor,
+                          selectedColor: Theme.of(context).textTheme.bodySmall?.color,
+                          fillColor: Theme.of(context).primaryColorLight,
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          disabledBorderColor: Theme.of(context).highlightColor,
+                          hoverColor: Theme.of(context).primaryColorDark,
+                          children: themes,                   
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 40,),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Other Settings",
                                   style: TextStyle(
                                     color: Theme.of(context).textTheme.bodySmall?.color,
-                                    fontSize: 18
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25
                                   ),
                                 ),
-                              ),
-                              SizedBox(width: 30,),
-                              Image(
-                                image: (user != null && user!['logo_dir'] != null && File(user!['logo_dir']).existsSync())
-                                    ? FileImage(File(user!['logo_dir']))
-                                    : const AssetImage('lib/assets/default.png') as ImageProvider,
-                                width: 100,
-                                height: 100,
-                              ),
-                            ],
+                              ],
+                            ),
+                            SizedBox(height: 25,),
+                            Row(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Theme.of(context).primaryColorLight,
+                                        foregroundColor: Theme.of(context).primaryColorDark,
+                                        elevation: 5,
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 15,
+                                          horizontal: 30
+                                        )
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          editTasks = true;
+                                        });
+                                      }, 
+                                      child: Text(
+                                        "Edit Task List",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 18
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(width: 10,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Theme.of(context).primaryColorLight,
+                                        foregroundColor: Theme.of(context).primaryColorDark,
+                                        elevation: 5,
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 15,
+                                          horizontal: 30
+                                        )
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          editPOS = true;
+                                        });                          
+                                      }, 
+                                      child: Text(
+                                        "Edit POS List",
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 18
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(width: 40,),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Logo",
+                                  style: TextStyle(
+                                    color: Theme.of(context).textTheme.bodySmall?.color,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 25,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context).primaryColorLight,
+                                    foregroundColor: Theme.of(context).primaryColorDark,
+                                    elevation: 5,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 15,
+                                      horizontal: 30
+                                    )
+                                  ),
+                                  onPressed: () {
+                                    pickImage();
+                                  }, 
+                                  child: Text(
+                                    "Choose",
+                                    style: TextStyle(
+                                      color: Theme.of(context).textTheme.bodySmall?.color,
+                                      fontSize: 18
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 30,),
+                                Image(
+                                  image: (user != null && user!['logo_dir'] != null && File(user!['logo_dir']).existsSync())
+                                      ? FileImage(File(user!['logo_dir']))
+                                      : const AssetImage('lib/assets/default.png') as ImageProvider,
+                                  width: 100,
+                                  height: 100,
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Default Email Message",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22
                           ),
-                        ],
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Defualt Email Message",
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 25,),
+                    SizedBox(
+                      height: 200,
+                      child: TextField(
+                        controller: _emailController,
+                        expands: true,
+                        maxLines: null,
+                        minLines: null,
                         style: TextStyle(
                           color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 25,),
-                  SizedBox(
-                    height: 200,
-                    child: TextField(
-                      controller: _emailController,
-                      expands: true,
-                      maxLines: null,
-                      minLines: null,
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.bodySmall?.color,
-                      ),
-                      textAlignVertical: TextAlignVertical.top,
-                      cursorColor: Theme.of(context).highlightColor,
-                      decoration: InputDecoration(
-                        fillColor: Theme.of(context).primaryColorLight,
-                        filled: true,
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Theme.of(context).highlightColor,
-                            width: 1.0,
-                          )
+                        textAlignVertical: TextAlignVertical.top,
+                        cursorColor: Theme.of(context).highlightColor,
+                        decoration: InputDecoration(
+                          fillColor: Theme.of(context).primaryColorLight,
+                          filled: true,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).highlightColor,
+                              width: 1.0,
+                            )
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).highlightColor,
+                              width: 1.0,
+                            )
+                          ),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Theme.of(context).highlightColor,
-                            width: 1.0,
-                          )
-                        ),
+                        onChanged: (e) {
+                          updateDefaultEmail(e);
+                        },                        
                       ),
-                      onChanged: (e) {
-                        updateDefaultEmail(e);
-                      },                        
-                    ),
-                  )
-                ],
-              ),
-            ),
-          )
-        ],
-      ),
-      Visibility(
-        visible: editTasks,
-        child: Positioned(
-          child: Container(
-            height: screenHeight,
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
-            ),
-            padding: EdgeInsets.only(
-              top: screenHeight * 0.18,
-              bottom: screenHeight * 0.18,
-              left: screenWidth * 0.35,
-              right: screenWidth * 0.35,
-            ),
-            child: Container(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20
-              ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8), // Shadow color
-                      spreadRadius: 3, // How much the shadow expands
-                      blurRadius: 5, // Softness of the shadow
-                      offset: Offset(0, 5), // Position changes (x, y)
-                    ),
+                    )
                   ],
                 ),
-                width: double.infinity,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.clear,
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                editTasks = false;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                              "Edit Task List",
-                              style: TextStyle(
-                                color: Theme.of(context).textTheme.bodySmall?.color,
-                                fontSize: 26,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      for (var task in taskList)
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.only(
-                            left: 10,
-                            top: 10,
-                            bottom: 10,
-                            right: 10
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Theme.of(context).highlightColor
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                task['task'],
-                                style: TextStyle(
-                                  color: Theme.of(context).textTheme.bodySmall?.color
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.delete_rounded,
-                                      color: Color.fromARGB(255, 201, 3, 3),
-                                    ),
-                                    onPressed: () {
-                                      deleteTask(task['task']);
-                                    },
-                                  ),
-                                ],
-                              )
-                              
-                            ],
-                          ),
-                        )
-                    ],
-                  ),
-                ),
               ),
-          ),
+            )
+          ],
         ),
-      ),
-      Visibility(
-        visible: editPOS,
-        child: Positioned(
-          child: Container(
-            height: screenHeight,
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
-            ),
-            padding: EdgeInsets.only(
-              top: screenHeight * 0.18,
-              bottom: screenHeight * 0.18,
-              left: screenWidth * 0.35,
-              right: screenWidth * 0.35,
-            ),
+        Visibility(
+          visible: editTasks,
+          child: Positioned(
             child: Container(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20
+              height: screenHeight,
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
               ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8), // Shadow color
-                      spreadRadius: 3, // How much the shadow expands
-                      blurRadius: 5, // Softness of the shadow
-                      offset: Offset(0, 5), // Position changes (x, y)
-                    ),
-                  ],
+              padding: EdgeInsets.only(
+                top: screenHeight * 0.18,
+                bottom: screenHeight * 0.18,
+                left: screenWidth * 0.35,
+                right: screenWidth * 0.35,
+              ),
+              child: Container(
+                padding: EdgeInsets.only(
+                  left: 20,
+                  right: 20
                 ),
-                width: double.infinity,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.clear,
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                editPOS = false;
-                              });
-                            },
-                          ),
-                        ],
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8), // Shadow color
+                        spreadRadius: 3, // How much the shadow expands
+                        blurRadius: 5, // Softness of the shadow
+                        offset: Offset(0, 5), // Position changes (x, y)
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                              "Edit POS List",
-                              style: TextStyle(
-                                color: Theme.of(context).textTheme.bodySmall?.color,
-                                fontSize: 26,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      for (var pos in posList)
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.only(
-                            left: 10,
-                            top: 10,
-                            bottom: 10,
-                            right: 10
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Theme.of(context).highlightColor
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                pos['pos'],
-                                style: TextStyle(
-                                  color: Theme.of(context).textTheme.bodySmall?.color
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.delete_rounded,
-                                      color: Color.fromARGB(255, 201, 3, 3),
-                                    ),
-                                    onPressed: () {
-                                      deletePOS(pos['pos']);
-                                    },
-                                  ),
-                                ],
-                              )
-                              
-                            ],
-                          ),
-                        )
                     ],
                   ),
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.clear,
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  editTasks = false;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                                "Edit Task List",
+                                style: TextStyle(
+                                  color: Theme.of(context).textTheme.bodySmall?.color,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        for (var task in taskList)
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.only(
+                              left: 10,
+                              top: 10,
+                              bottom: 10,
+                              right: 10
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Theme.of(context).highlightColor
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  task['task'],
+                                  style: TextStyle(
+                                    color: Theme.of(context).textTheme.bodySmall?.color
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.delete_rounded,
+                                        color: Color.fromARGB(255, 201, 3, 3),
+                                      ),
+                                      onPressed: () {
+                                        deleteTask(task['task']);
+                                      },
+                                    ),
+                                  ],
+                                )
+                                
+                              ],
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+            ),
           ),
         ),
+        Visibility(
+          visible: editPOS,
+          child: Positioned(
+            child: Container(
+              height: screenHeight,
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
+              ),
+              padding: EdgeInsets.only(
+                top: screenHeight * 0.18,
+                bottom: screenHeight * 0.18,
+                left: screenWidth * 0.35,
+                right: screenWidth * 0.35,
+              ),
+              child: Container(
+                padding: EdgeInsets.only(
+                  left: 20,
+                  right: 20
+                ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8), // Shadow color
+                        spreadRadius: 3, // How much the shadow expands
+                        blurRadius: 5, // Softness of the shadow
+                        offset: Offset(0, 5), // Position changes (x, y)
+                      ),
+                    ],
+                  ),
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.clear,
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  editPOS = false;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                                "Edit POS List",
+                                style: TextStyle(
+                                  color: Theme.of(context).textTheme.bodySmall?.color,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        for (var pos in posList)
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.only(
+                              left: 10,
+                              top: 10,
+                              bottom: 10,
+                              right: 10
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Theme.of(context).highlightColor
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  pos['pos'],
+                                  style: TextStyle(
+                                    color: Theme.of(context).textTheme.bodySmall?.color
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.delete_rounded,
+                                        color: Color.fromARGB(255, 201, 3, 3),
+                                      ),
+                                      onPressed: () {
+                                        deletePOS(pos['pos']);
+                                      },
+                                    ),
+                                  ],
+                                )
+                                
+                              ],
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+                ),
+            ),
+          ),
+        ),
+        ]
       ),
-      ]
     );
   }
 }

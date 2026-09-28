@@ -935,7 +935,7 @@ class _ClientProfileState extends State<ClientProfile> {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 300,
+                                    height: screenHeight * 0.2,
                                     child: TextField(
                                       controller: _notesController,
                                       expands: true,
@@ -1428,100 +1428,83 @@ class _ClientProfileState extends State<ClientProfile> {
                 color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
               ),
               padding: EdgeInsets.only(
-                top: screenHeight * 0.35,
-                bottom: screenHeight * 0.35,
-                left: screenWidth * 0.33,
-                right: screenWidth * 0.33,
+                top: 100,
+                left: 600,
+                right: 600,
+                bottom: screenHeight * 0.6
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  border: Border.all(
-                    color: const Color.fromARGB(255, 216, 19, 5),
-                    width: 2
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8),
-                      spreadRadius: 3,
-                      blurRadius: 5,
-                      offset: Offset(0, 5) 
-                    )
-                  ]
-                ),
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(
-                        top: 50
-                      ),
-                      child: Text(
-                        "Are you sure you want to delete this Task?",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 30,
+              child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(
+                          top: 50
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    SizedBox(height: 35,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            deleteTimeTask(taskID);
-                            deleteBool = false;
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 218, 29, 15),
-                            foregroundColor: Theme.of(context).primaryColorDark,
-                            elevation: 5,
-                            padding: EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 30
-                            )
+                        child: Text(
+                          "Are you sure you want to delete this Task?",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 30,
                           ),
-                          child: Text(
-                            "Delete",
-                            style: TextStyle(
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                              fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
-                              fontSize: 18,
-                            ),
-                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
+                      ),
+                      SizedBox(height: 35,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              deleteTimeTask(taskID);
                               deleteBool = false;
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColorLight,
-                            foregroundColor: Theme.of(context).primaryColorDark,
-                            elevation: 5,
-                            padding: EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 30
-                            )
-                          ),
-                          child: Text(
-                            "Cancel",
-                            style: TextStyle(
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                              fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
-                              fontSize: 18,
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color.fromARGB(255, 218, 29, 15),
+                              foregroundColor: Theme.of(context).primaryColorDark,
+                              elevation: 5,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 30
+                              )
+                            ),
+                            child: Text(
+                              "Delete",
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
-                        )
-                      ],
-                    )
-                  ],
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                deleteBool = false;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColorLight,
+                              foregroundColor: Theme.of(context).primaryColorDark,
+                              elevation: 5,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 30
+                              )
+                            ),
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                fontSize: 18,
+                              ),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 ),
-              ),
             )
           ),
         ),
@@ -1538,25 +1521,7 @@ class _ClientProfileState extends State<ClientProfile> {
                 left: screenWidth * 0.33,
                 right: screenWidth * 0.33,
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  border: Border.all(
-                    color: const Color.fromARGB(255, 216, 19, 5),
-                    width: 2
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8),
-                      spreadRadius: 3,
-                      blurRadius: 5,
-                      offset: Offset(0, 5) 
-                    )
-                  ]
-                ),
-                width: double.infinity,
-                child: Column(
+              child: Column(
                   children: [
                     Container(
                       padding: EdgeInsets.only(
@@ -1626,7 +1591,6 @@ class _ClientProfileState extends State<ClientProfile> {
                     )
                   ],
                 ),
-              ),
             )
           ),
         ),
@@ -1699,7 +1663,10 @@ class _ClientProfileState extends State<ClientProfile> {
                     SizedBox(
                       height: 20,
                     ),
-                    Column(
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          Column(
                       children: [
                         Text(
                           "Invoice Number:",
@@ -1832,6 +1799,9 @@ class _ClientProfileState extends State<ClientProfile> {
                           ),
                       ],
                     )
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -1851,25 +1821,7 @@ class _ClientProfileState extends State<ClientProfile> {
                 left: screenWidth * 0.33,
                 right: screenWidth * 0.33,
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  border: Border.all(
-                    color: const Color.fromARGB(255, 216, 19, 5),
-                    width: 2
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8),
-                      spreadRadius: 3,
-                      blurRadius: 5,
-                      offset: Offset(0, 5) 
-                    )
-                  ]
-                ),
-                width: double.infinity,
-                child: Column(
+              child: Column(
                   children: [
                     Container(
                       padding: EdgeInsets.only(
@@ -1941,7 +1893,6 @@ class _ClientProfileState extends State<ClientProfile> {
                     )
                   ],
                 ),
-              ),
             )
           ),
         ),
@@ -2009,7 +1960,10 @@ class _ClientProfileState extends State<ClientProfile> {
                       ],
                     ),
                     SizedBox(height: 20,),
-                    Row(
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          Row(
                       children: [
                         SizedBox(width: 30,),
                         Text(
@@ -2116,6 +2070,9 @@ class _ClientProfileState extends State<ClientProfile> {
                           ),
                         )
                       ],
+                    )
+                        ],
+                      ),
                     )
                   ],
                 )

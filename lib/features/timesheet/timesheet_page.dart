@@ -874,7 +874,10 @@ class _TimesheetState extends State<Timesheet> {
                     SizedBox(
                       height: 20,
                     ),
-                    Row(
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
@@ -1186,6 +1189,9 @@ class _TimesheetState extends State<Timesheet> {
                         ),
                       ],
                     )
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -1223,77 +1229,79 @@ class _TimesheetState extends State<Timesheet> {
                   ]
                 ),
                 width: double.infinity,
-                child: Column(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(
-                        top: 50
-                      ),
-                      child: Text(
-                        "Are you sure you want to delete this Task?",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 30,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(
+                          top: 50
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    SizedBox(height: 35,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            deleteTimeTask(selectedClientID);
-                            deleteBool = false;
-                            selectedClientID = 0;
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 218, 29, 15),
-                            foregroundColor: Theme.of(context).primaryColorDark,
-                            elevation: 5,
-                            padding: EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 30
-                            )
+                        child: Text(
+                          "Are you sure you want to delete this Task?",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 30,
                           ),
-                          child: Text(
-                            "Delete",
-                            style: TextStyle(
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                              fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
-                              fontSize: 18,
-                            ),
-                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
+                      ),
+                      SizedBox(height: 35,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              deleteTimeTask(selectedClientID);
                               deleteBool = false;
                               selectedClientID = 0;
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColorLight,
-                            foregroundColor: Theme.of(context).highlightColor,
-                            elevation: 5,
-                            padding: EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 30
-                            )
-                          ),
-                          child: Text(
-                            "Cancel",
-                            style: TextStyle(
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                              fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
-                              fontSize: 18,
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color.fromARGB(255, 218, 29, 15),
+                              foregroundColor: Theme.of(context).primaryColorDark,
+                              elevation: 5,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 30
+                              )
+                            ),
+                            child: Text(
+                              "Delete",
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
-                        )
-                      ],
-                    )
-                  ],
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                deleteBool = false;
+                                selectedClientID = 0;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColorLight,
+                              foregroundColor: Theme.of(context).highlightColor,
+                              elevation: 5,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 30
+                              )
+                            ),
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                fontSize: 18,
+                              ),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             )
@@ -1367,7 +1375,10 @@ class _TimesheetState extends State<Timesheet> {
                     SizedBox(
                       height: 20,
                     ),
-                    Row(
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
@@ -1434,20 +1445,6 @@ class _TimesheetState extends State<Timesheet> {
                             ],
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.only(
-                            right: 20
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              addTasks(_taskListController.text);
-                            },
-                            icon: Icon(
-                              Icons.add,
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                            ),
-                          ),
-                        )
                       ],
                     ),
                     SizedBox(
@@ -1592,20 +1589,6 @@ class _TimesheetState extends State<Timesheet> {
                             ],
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.only(
-                            right: 20
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              addPos(_posController.text);
-                            },
-                            icon: Icon(
-                              Icons.add,
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                     SizedBox(
@@ -1660,6 +1643,8 @@ class _TimesheetState extends State<Timesheet> {
                                 taskDate.toString().split(' ')[0],
                                 int.parse(_hoursController.text)
                               );
+                              addTasks(_taskListController.text,);
+                              addPos(_posController.text,);
                               clearControllers();
                               setState(() {
                                 editTask = false;
@@ -1685,6 +1670,9 @@ class _TimesheetState extends State<Timesheet> {
                           ),
                         ),
                       ],
+                    )
+                        ],
+                      ),
                     )
                   ],
                 ),

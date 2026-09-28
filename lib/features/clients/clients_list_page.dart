@@ -94,7 +94,7 @@ class _ClientsState extends State<Clients> {
     String contactName, 
     String number, 
     String email, 
-    int vatNum, 
+    String vatNum, 
     String address,
     String suburb,
     String city,
@@ -142,7 +142,7 @@ class _ClientsState extends State<Clients> {
     String contactPerson, 
     String contactNum, 
     String email, 
-    int vatNum, 
+    String vatNum, 
     String address, 
     String suburb, 
     String city, 
@@ -663,224 +663,231 @@ class _ClientsState extends State<Clients> {
           visible: addClient,
           child: Positioned(
             child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
-              ),
-              padding: EdgeInsets.only(
-                top: screenHeight * 0.11,
-                bottom: screenHeight * 0.11,
-                left: screenWidth * 0.20,
-                right: screenWidth * 0.20,
-              ),
-              child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8),
-                      spreadRadius: 3,
-                      blurRadius: 5,
-                      offset: Offset(0, 5)
-                    )
-                  ]
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
                 ),
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.clear,
-                            color: Theme.of(context).textTheme.bodySmall?.color,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              addClient = false;
-                            });
-                            clearControllers();
-                          },
-                        )
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(
-                            left: 20
-                          ),
-                          child: Text(
-                            "New Client",
-                            style: TextStyle(
+                padding: EdgeInsets.only(
+                  top: screenHeight * 0.11,
+                  bottom: screenHeight * 0.11,
+                  left: screenWidth * 0.25,
+                  right: screenWidth * 0.25,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8),
+                        spreadRadius: 3,
+                        blurRadius: 5,
+                        offset: Offset(0, 5)
+                      )
+                    ]
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.clear,
                               color: Theme.of(context).textTheme.bodySmall?.color,
-                              fontSize: 26,
-                              fontWeight: FontWeight.w400,
                             ),
-                            textAlign: TextAlign.left,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: 20,),
-                    Container(
-                      padding: EdgeInsets.only(
-                        left: 20,
-                        right: 20
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomTextInput(labelName: "Client Name*", hintText: "Client Name...", password: false, inputController: _clientNameController),
-                          CustomTextInput(labelName: "Street Address*", hintText: "Street Address...", password: false, inputController: _streetAddressController),
+                            onPressed: () {
+                              setState(() {
+                                addClient = false;
+                              });
+                              clearControllers();
+                            },
+                          )
                         ],
                       ),
-                    ),
-                    SizedBox(height: 20,),
-                    Container(
-                      padding: EdgeInsets.only(
-                        left: 20,
-                        right: 20
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          CustomTextInput(labelName: "Contact Person*", hintText: "Contact Person...", password: false, inputController: _contactPersonController),
-                          CustomTextInput(labelName: "Suburb*", hintText: "Suburb...", password: false, inputController: _suburbController),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20,),
-                    Container(
-                      padding: EdgeInsets.only(
-                        left: 20,
-                        right: 20
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomTextInput(labelName: "Contact Number*", hintText: "Contact Number...", password: false, inputController: _contactNumberController),
-                          CustomTextInput(labelName: "City*", hintText: "City...", password: false, inputController: _cityController),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20,),
-                    Container(
-                      padding: EdgeInsets.only(
-                        left: 20,
-                        right: 20
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomTextInput(labelName: "Email*", hintText: "Email...", password: false, inputController: _emailController),
-                          CustomTextInput(labelName: "Postal Code*", hintText: "Postal Code...", password: false, inputController: _postalCodeController),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20,),
-                    Container(
-                      padding: EdgeInsets.only(
-                        left: 20,
-                        right: 20
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomTextInput(labelName: "VAT Number", hintText: "VAT Number...", password: false, inputController: _vatNumberController),
-                          CustomTextInput(labelName: "Quoted Price Per Unit*", hintText: "Quoted Price...", password: false, inputController: _quotePriceController),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20,),
-                    Container(
-                      padding: EdgeInsets.only(
-                        left: 20,
-                        right: 20
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomTextInput(labelName: "Payment Term in Days*", hintText: "Payment Term...", password: false, inputController: _paymentTermsController),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(
-                            right: 20
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                inputerr ? "Please Complete All Inputs Marked With *." : "",
-                                style: TextStyle(
-                                  color: Theme.of(context).hintColor,
-                                  fontSize: 18
-                                ),
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: 20
+                            ),
+                            child: Text(
+                              "New Client",
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontSize: 26,
+                                fontWeight: FontWeight.w400,
                               ),
-                              SizedBox(width: 20,),
-                              ElevatedButton(
-                                onPressed: () {
-                                  if (checkInputs() == true) {
-                                    addNewClient(
-                                      _clientNameController.text, 
-                                      _contactPersonController.text, 
-                                      _contactNumberController.text,
-                                      _emailController.text, 
-                                      _vatNumberController.text.trim().isEmpty ? 0 : int.parse(_vatNumberController.text), 
-                                      _streetAddressController.text, 
-                                      _suburbController.text, 
-                                      _cityController.text, 
-                                      int.parse(_postalCodeController.text),
-                                      double.parse(_quotePriceController.text),
-                                      int.parse(_paymentTermsController.text),
-                                    );
-                                    setState(() {
-                                      addClient = false;
-                                      inputerr = false;
-                                    });
-                                  }
-                                  else {
-                                    setState(() {
-                                      inputerr = true;
-                                    });
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).primaryColorLight,
-                                  foregroundColor: Theme.of(context).primaryColorDark,
-                                  elevation: 5,
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 15,
-                                    horizontal: 30
-                                  )
-                                ),
-                                child: Text(
-                                  "Done",
+                              textAlign: TextAlign.left,
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(height: screenHeight * 0.005,),
+                      Expanded(
+                        child: ListView(
+                          children: [
+                            Container(
+                        padding: EdgeInsets.only(
+                          left: 20,
+                          right: 20
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomTextInput(labelName: "Client Name*", hintText: "Client Name...", password: false, inputController: _clientNameController),
+                            CustomTextInput(labelName: "Street Address*", hintText: "Street Address...", password: false, inputController: _streetAddressController),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.005,),
+                      Container(
+                        padding: EdgeInsets.only(
+                          left: 20,
+                          right: 20
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomTextInput(labelName: "Contact Person*", hintText: "Contact Person...", password: false, inputController: _contactPersonController),
+                            CustomTextInput(labelName: "Suburb*", hintText: "Suburb...", password: false, inputController: _suburbController),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.005,),
+                      Container(
+                        padding: EdgeInsets.only(
+                          left: 20,
+                          right: 20
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomTextInput(labelName: "Contact Number*", hintText: "Contact Number...", password: false, inputController: _contactNumberController),
+                            CustomTextInput(labelName: "City*", hintText: "City...", password: false, inputController: _cityController),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.005,),
+                      Container(
+                        padding: EdgeInsets.only(
+                          left: 20,
+                          right: 20
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomTextInput(labelName: "Email*", hintText: "Email...", password: false, inputController: _emailController),
+                            CustomTextInput(labelName: "Postal Code*", hintText: "Postal Code...", password: false, inputController: _postalCodeController),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.005,),
+                      Container(
+                        padding: EdgeInsets.only(
+                          left: 20,
+                          right: 20
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomTextInput(labelName: "VAT Number", hintText: "VAT Number...", password: false, inputController: _vatNumberController),
+                            CustomTextInput(labelName: "Quoted Price Per Unit*", hintText: "Quoted Price...", password: false, inputController: _quotePriceController),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.005,),
+                      Container(
+                        padding: EdgeInsets.only(
+                          left: 20,
+                          right: 20
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomTextInput(labelName: "Payment Term in Days*", hintText: "Payment Term...", password: false, inputController: _paymentTermsController),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.005,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                              right: 20
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  inputerr ? "Please Complete All Inputs Marked With *." : "",
                                   style: TextStyle(
-                                    color: Theme.of(context).textTheme.bodySmall?.color,
-                                    fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                    color: Theme.of(context).hintColor,
                                     fontSize: 18
                                   ),
                                 ),
-                              ),
-                            ],
+                                SizedBox(width: screenWidth * 0.005,),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (checkInputs() == true) {
+                                      addNewClient(
+                                        _clientNameController.text, 
+                                        _contactPersonController.text, 
+                                        _contactNumberController.text,
+                                        _emailController.text, 
+                                        _vatNumberController.text.trim().isEmpty ? "0" : _vatNumberController.text, 
+                                        _streetAddressController.text, 
+                                        _suburbController.text, 
+                                        _cityController.text, 
+                                        int.parse(_postalCodeController.text),
+                                        double.parse(_quotePriceController.text),
+                                        int.parse(_paymentTermsController.text),
+                                      );
+                                      setState(() {
+                                        addClient = false;
+                                        inputerr = false;
+                                      });
+                                    }
+                                    else {
+                                      setState(() {
+                                        inputerr = true;
+                                      });
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context).primaryColorLight,
+                                    foregroundColor: Theme.of(context).primaryColorDark,
+                                    elevation: 5,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 15,
+                                      horizontal: 30
+                                    )
+                                  ),
+                                  child: Text(
+                                    "Done",
+                                    style: TextStyle(
+                                      color: Theme.of(context).textTheme.bodySmall?.color,
+                                      fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                      fontSize: 18
+                                    ),
+                                  ),
+                                ),
+                            
+                              ],
+                            ),
                           ),
+                        ],
+                      ),
+                          ],
                         ),
-                      ],
-                    )
-                  ],
+                      ),
+                      SizedBox(height: screenHeight * 0.005,)
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
         Visibility(
           visible: deleteBool,
           child: Positioned(
@@ -888,103 +895,88 @@ class _ClientsState extends State<Clients> {
               decoration: BoxDecoration(
                 color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
               ),
+              width: screenWidth,
+              height: screenHeight,
               padding: EdgeInsets.only(
-                top: screenHeight * 0.35,
-                bottom: screenHeight * 0.35,
-                left: screenWidth * 0.35,
-                right: screenWidth * 0.35,
+                top: 100,
+                left: 600,
+                right: 600,
+                bottom: screenHeight * 0.6
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  border: Border.all(
-                    color: const Color.fromARGB(255, 216, 19, 5),
-                    width: 2
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).primaryColorDark.withValues(alpha: 0.8),
-                      spreadRadius: 3,
-                      blurRadius: 5,
-                      offset: Offset(0, 5) 
-                    )
-                  ]
-                ),
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(
-                        top: 50
-                      ),
-                      child: Text(
-                        "Are you sure you want to delete this Client?",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 30,
+              child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(
+                          top: 50
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    SizedBox(height: 35,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            deleteClient(id: selectedClientID);
-                            deleteBool = false;
-                            selectedClientID = '';
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 218, 29, 15),
-                            foregroundColor: Theme.of(context).primaryColorDark,
-                            elevation: 5,
-                            padding: EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 30
-                            )
+                        child: Text(
+                          "Are you sure you want to delete this Client?",
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 30,
                           ),
-                          child: Text(
-                            "Delete",
-                            style: TextStyle(
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                              fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
-                              fontSize: 18,
-                            ),
-                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
+                      ),
+                      SizedBox(height: 35,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              deleteClient(id: selectedClientID);
                               deleteBool = false;
                               selectedClientID = '';
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColorLight,
-                            foregroundColor: Theme.of(context).primaryColorDark,
-                            elevation: 5,
-                            padding: EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 30
-                            )
-                          ),
-                          child: Text(
-                            "Cancel",
-                            style: TextStyle(
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                              fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
-                              fontSize: 18,
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color.fromARGB(255, 218, 29, 15),
+                              foregroundColor: Theme.of(context).primaryColorDark,
+                              elevation: 5,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 30
+                              )
+                            ),
+                            child: Text(
+                              "Delete",
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
-                        )
-                      ],
-                    )
-                  ],
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                deleteBool = false;
+                                selectedClientID = '';
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColorLight,
+                              foregroundColor: Theme.of(context).primaryColorDark,
+                              elevation: 5,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 30
+                              )
+                            ),
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                fontSize: 18,
+                              ),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 ),
-              ),
             )
           ),
         ),
@@ -1054,7 +1046,10 @@ class _ClientsState extends State<Clients> {
                       ],
                     ),
                     SizedBox(height: 20,),
-                    Container(
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          Container(
                       padding: EdgeInsets.only(
                         left: 20,
                         right: 20
@@ -1152,7 +1147,7 @@ class _ClientsState extends State<Clients> {
                                 _contactPersonController.text, 
                                 _contactNumberController.text,
                                 _emailController.text, 
-                                _vatNumberController.text.trim().isEmpty ? 0 : int.parse(_vatNumberController.text), 
+                                _vatNumberController.text.trim().isEmpty ? "0" : _vatNumberController.text, 
                                 _streetAddressController.text, 
                                 _suburbController.text, 
                                 _cityController.text, 
@@ -1184,6 +1179,9 @@ class _ClientsState extends State<Clients> {
                           ),
                         ),
                       ],
+                    )
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -1217,121 +1215,54 @@ class _ClientsState extends State<Clients> {
                     ),
                   ]
                 ),
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.clear,
-                            color: Theme.of(context).textTheme.bodySmall?.color,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              statement = false;
-                            });
-                          },
-                        ),                      
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(
-                            left: 20
-                          ),
-                          child: Text(
-                            "Generate Statement",
-                            style: TextStyle(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.clear,
                               color: Theme.of(context).textTheme.bodySmall?.color,
-                              fontSize: 26,
-                              fontWeight: FontWeight.w400
                             ),
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                        SizedBox(height: 20,),
-                        
-                      ],
-                    ),
-                    SizedBox(height: 30,),
-                    Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            SizedBox(
-                              width: 250,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _selectDateOne();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).primaryColorLight,
-                                  foregroundColor: Theme.of(context).highlightColor,
-                                  elevation: 5,
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 15,
-                                    horizontal: 30
-                                  )
-                                ),
-                                child: Text(
-                                  statementStart,
-                                  style: TextStyle(
-                                    color: Theme.of(context).textTheme.bodySmall?.color,
-                                    fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
-                                    fontSize: 18
-                                  ),
-                                ),
-                              ),
+                            onPressed: () {
+                              setState(() {
+                                statement = false;
+                              });
+                            },
+                          ),                      
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: 20
                             ),
-                            Text(
-                              "-",
+                            child: Text(
+                              "Generate Statement",
                               style: TextStyle(
                                 color: Theme.of(context).textTheme.bodySmall?.color,
-                                fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
-                                fontSize: 18
+                                fontSize: 26,
+                                fontWeight: FontWeight.w400
                               ),
+                              textAlign: TextAlign.left,
                             ),
-                            SizedBox(
-                              width: 250,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _selectDateTwo();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).primaryColorLight,
-                                  foregroundColor: Theme.of(context).highlightColor,
-                                  elevation: 5,
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 15,
-                                    horizontal: 30
-                                  ),
-                                ),
-                                child: Text(
-                                  statementEnd,
-                                  style: TextStyle(
-                                    color: Theme.of(context).textTheme.bodySmall?.color,
-                                    fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
-                                    fontSize: 18
-                                  ),
-                                ),
-                              ),
-                            ),
-                            
-                          ],
-                        ),
-                        SizedBox(height: 30,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ElevatedButton(
+                          ),
+                          SizedBox(height: 20,),
+                          
+                        ],
+                      ),
+                      SizedBox(height: 30,),
+                      Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              SizedBox(
+                                width: 250,
+                                child: ElevatedButton(
                                   onPressed: () {
-                                    setState(() {
-                                      statement = false;
-                                    });
-                                    getTermInvoices();
-                                    createStatementPDF();
+                                    _selectDateOne();
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Theme.of(context).primaryColorLight,
@@ -1343,17 +1274,85 @@ class _ClientsState extends State<Clients> {
                                     )
                                   ),
                                   child: Text(
-                                    "Generate",
+                                    statementStart,
                                     style: TextStyle(
                                       color: Theme.of(context).textTheme.bodySmall?.color,
                                       fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
                                       fontSize: 18
                                     ),
                                   ),
-                                )
-                              ],
-                            )
-                  ],
+                                ),
+                              ),
+                              Text(
+                                "-",
+                                style: TextStyle(
+                                  color: Theme.of(context).textTheme.bodySmall?.color,
+                                  fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                  fontSize: 18
+                                ),
+                              ),
+                              SizedBox(
+                                width: 250,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _selectDateTwo();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context).primaryColorLight,
+                                    foregroundColor: Theme.of(context).highlightColor,
+                                    elevation: 5,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 15,
+                                      horizontal: 30
+                                    ),
+                                  ),
+                                  child: Text(
+                                    statementEnd,
+                                    style: TextStyle(
+                                      color: Theme.of(context).textTheme.bodySmall?.color,
+                                      fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                      fontSize: 18
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              
+                            ],
+                          ),
+                          SizedBox(height: 30,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        statement = false;
+                                      });
+                                      getTermInvoices();
+                                      createStatementPDF();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context).primaryColorLight,
+                                      foregroundColor: Theme.of(context).highlightColor,
+                                      elevation: 5,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 15,
+                                        horizontal: 30
+                                      )
+                                    ),
+                                    child: Text(
+                                      "Generate",
+                                      style: TextStyle(
+                                        color: Theme.of(context).textTheme.bodySmall?.color,
+                                        fontWeight: Theme.of(context).textTheme.bodySmall?.fontWeight,
+                                        fontSize: 18
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              )
+                    ],
+                  ),
                 ),
               ),
             ),

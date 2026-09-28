@@ -32,7 +32,7 @@ class _SetupPageState extends State<SetupPage> {
     String? number, 
     String? userEmail,
     String? vatRegistered,
-    int? vatNum, 
+    String? vatNum, 
     int? vatPercentage,
     int? recentInvoice,
     int? resentStatement,
@@ -41,9 +41,9 @@ class _SetupPageState extends State<SetupPage> {
     String? suburb, 
     int? postalCode,
     String? bank, 
-    int? branchCode, 
-    int? bic,
-    int? accountNumber, 
+    String? branchCode, 
+    String? bic,
+    String? accountNumber, 
     String? theme, 
     String? password, 
   }) {
@@ -235,7 +235,7 @@ class UserDraft {
   String? number;
   String? email;
   String? vatRegistered;
-  int? vatNumber;
+  String? vatNumber;
   int? vatPercentage;
   int? recentInvoice;
   int? resentStatement;
@@ -244,9 +244,9 @@ class UserDraft {
   String? suburb;
   int? postalCode;
   String? bank;
-  int? branchCode;
-  int? bic;
-  int? accountNumber;
+  String? branchCode;
+  String? bic;
+  String? accountNumber;
   String? theme;
   String? password;
 }

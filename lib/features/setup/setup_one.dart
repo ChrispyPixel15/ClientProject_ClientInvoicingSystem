@@ -11,7 +11,7 @@ class SetupOne extends StatefulWidget {
     String? number, 
     String? userEmail,
     String? vatRegistered,
-    int? vatNum, 
+    String? vatNum, 
     int? vatPercentage,
     int? recentInvoice,
     int? resentStatement,
@@ -20,9 +20,9 @@ class SetupOne extends StatefulWidget {
     String? suburb, 
     int? postalCode,
     String? bank, 
-    int? branchCode, 
-    int? bic,
-    int? accountNumber, 
+    String? branchCode, 
+    String? bic,
+    String? accountNumber, 
     String? theme, 
     String? password, 
   }) updateUser;
@@ -66,7 +66,7 @@ class _SetupOneState extends State<SetupOne> {
   @override
   Widget build(BuildContext context) {
     bool checkInputs() {
-      if (_nameController.text.trim().isEmpty || _busNameController.text.trim().isEmpty || _numberController.text.trim().isEmpty || _emailController.text.trim().isEmpty) {
+      if (_nameController.text.trim().isEmpty || _numberController.text.trim().isEmpty || _emailController.text.trim().isEmpty) {
         return false;
       }
       else {
@@ -191,11 +191,11 @@ class _SetupOneState extends State<SetupOne> {
                       if (checkInputs() == true) {
                         widget.updateUser(
                           userName: _nameController.text,
-                          busName: _busNameController.text,
+                          busName: _busNameController.text.trim().isEmpty ? "" : _busNameController.text,
                           number: _numberController.text,
                           userEmail: _emailController.text,
                           vatRegistered: widget.vatRegistered.toString(),
-                          vatNum: _vatNumberController.text.trim().isEmpty ? 0 : int.parse(_vatNumberController.text),
+                          vatNum: _vatNumberController.text.trim().isEmpty ? "0" : _vatNumberController.text,
                           vatPercentage: _vatPercentageController.text.trim().isEmpty ? 0 : int.parse(_vatPercentageController.text),
                           recentInvoice: _invoiceController.text.trim().isEmpty ? 0 : int.parse( _invoiceController.text),
                           resentStatement: _statementController.text.trim().isEmpty ? 0 : int.parse(_statementController.text),
